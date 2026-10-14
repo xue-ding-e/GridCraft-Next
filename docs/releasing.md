@@ -1,8 +1,66 @@
 # GridCraft-Next release status
 
-Modified on 2026-10-14 for the independent derivative. Automatic release, signing, shared upstream release jobs, and Pages deployment workflows are disabled. Only the read-only CI workflow is active. No GridCraft-Next binary release is available. The exact `b8d298390064b6ddcb55341b399164ef9eebf27a` runtime baseline passed actual hosted-Windows installation, native Rust GUI and complete installer lifecycle checks in [run 38593323401](https://github.com/xue-ding-e/GridCraft-Next/actions/runs/38593323401). Its internal-validation-only distribution gate correctly remained failed; final legal/toolchain evidence and a clean deliverable rebuild are pending.
+Modified on 2026-10-14 for the independent derivative. Automatic release, signing,
+shared upstream release jobs and Pages deployment remain disabled. Windows x64
+publication uses the separate manual `windows-release.yml` workflow described below.
+[GitHub Releases](https://github.com/xue-ding-e/GridCraft-Next/releases) is the download
+location; a successful source push or diagnostic artifact is not a binary release.
 
-Local packaging scripts are being adapted for independent application IDs, installation paths and license inclusion. Their Windows/macOS/Linux/FreeBSD output still requires platform-specific validation before release. The macOS upstream branded Finder layout is not used.
+The exact `b8d298390064b6ddcb55341b399164ef9eebf27a` runtime baseline passed actual
+hosted-Windows installation, native Rust GUI and complete installer lifecycle checks
+in [run 38593323401](https://github.com/xue-ding-e/GridCraft-Next/actions/runs/38593323401).
+Those baseline packages were marked internal-validation-only and were not published.
+Each distributable package must independently pass the same checks at its own exact
+source SHA and byte hashes. macOS/Linux/FreeBSD packaging remains separately unverified;
+the upstream branded macOS Finder layout is not used.
+
+## Manual Windows release promotion
+
+1. Review the actual target/feature-scoped Cargo inventory and installed toolchain
+   originals. Record exact fingerprints in `license-review.json` and
+   `windows-release-review.json`; the latter also maps required original toolchain
+   notices to their SHA256 hashes. No script generates an approval automatically.
+2. Build and test the exact candidate through `ci.yml`. The original Linux/WASM
+   `cargo xtask ci`, inexpensive Windows scripts, real native Rust/installer lifecycle,
+   and final all-job aggregation must all succeed on the latest run attempt.
+3. The Windows producer collects the actual final-link evidence before packaging,
+   copies the reviewed original notices into both formats, and tests those exact
+   packages. Only a complete distribution-eligible result can produce the five-file
+   `windows-release-<source-sha>-attempt-<attempt>` artifact. An internal marker,
+   stale approval, missing notice, failed native test or missing evidence blocks it.
+4. Manually dispatch `windows-release.yml` at that exact source SHA with `source_sha`
+   and `ci_run_id`. The dispatcher code, completed CI run and producer artifact must
+   identify the same repository and SHA. The workflow rechecks the latest attempt,
+   every required job/step, artifact digest, package hashes and evidence.
+5. The sole publication job uses only the existing ephemeral Actions token with
+   `contents: write`; build/verification jobs remain read-only. It creates a fresh
+   draft, uploads the five assets, downloads and verifies them, creates the exact tag
+   without replacing an existing tag, then publishes and verifies anonymous downloads.
+   A failure leaves the draft unpublished. Existing tags/releases are never overwritten.
+
+The five release assets are the MSI, portable ZIP, `SHA256SUMS`,
+`RELEASE-EVIDENCE.json` and `release-manifest.json`. The evidence records source,
+toolchain, original notices, actual package hashes and automated native test scope.
+It is not a legal certification, code-signing certificate or hardware certification.
+No long-lived release credential, signing secret, repository-wide permission change
+or security-warning bypass is required by this workflow.
+
+### Microsoft runtime scope
+
+The Windows x64 binaries embed release CRT code from MSVC and the Windows SDK.
+The applicable original Microsoft terms govern those components' acquisition,
+installation, use and redistribution. Both package formats retain the exact
+Microsoft Visual Studio 2022 Enterprise/Professional DOCX and selected SDK RTF,
+plus the [scope notice](../packaging/windows/microsoft-runtime-terms/WINDOWS-RUNTIME-LICENSE-NOTICE.txt).
+The download page discloses the same scope and links the official terms. These
+components are not relicensed under the project's MIT/Apache-2.0 source licenses;
+no additional commercial restrictions are authored by this project.
+
+The DOCX evidence exception is limited to its reviewed exact basename, 63,513-byte
+size and SHA256; arbitrary Office documents remain rejected. Runtime original
+notices, source receipts and the scope notice enter the exact toolchain review
+fingerprint and both packages' native-tested legal payload. A matching fingerprint
+is a materials-review record, not a lawyer's compliance certification.
 
 ## Independent Windows validation policy
 
@@ -31,7 +89,7 @@ UpgradeCode is `73F9F3B2-548C-4F5B-8934-253B3C29E0B1`; it is never the upstream
 upgrade family. Equal-version packages with different ProductCodes are rejected,
 while maintenance using the identical original MSI remains permitted.
 `test-version.ps1` exhausts all 65,536 patch/rank encodings; `test-msi-version.ps1`
-checks emitted MSI tables. Actual transition and coexistence tests are still required.
+checks emitted MSI tables. Actual transition and coexistence tests remain mandatory for each release candidate.
 
 The legal gate inventories packages actually observed in the locked GUI/CLI build,
 conservatively retaining host build-input notices too. Original license/NOTICE bytes,
@@ -60,13 +118,13 @@ and the confirmed generated-code/font attributions; a package's SPDX expression
 alone does not replace an original copyright or notice. Windows checkout preserves
 those bytes through targeted `.gitattributes -text` rules. The additional IJG and
 font acknowledgments are visible in `NOTICE`. Collection and provenance checks are
-not a legal certification, and no approved review fingerprint is supplied yet.
+not a legal certification; an approved fingerprint must match the actual reviewed inputs exactly.
 
 Windows validation pins Rust `1.99.0` (commit
 `b940084d7eb6a299eb4bfeb8e34901bc051e7ac4`). The selected, already installed
 Visual Studio/MSVC and Windows SDK versions and relevant file hashes are recorded.
 A linker wrapper forwards the real arguments and return status, adding only
-`/VERBOSE:LIB`; it records actual loaded static runtime libraries separately from
+`/VERBOSE`; it records actual loaded static runtime libraries separately from
 libraries merely searched. Each final link output is matched to the GUI/CLI bytes.
 A tiny synthetic C fixture tests this wrapper before any large Rust build; the
 fixture is never executed and does not establish Rust GUI behavior.
@@ -76,8 +134,8 @@ values stay runner-local. Only explicitly validated, path-free JSON and selected
 original legal texts enter diagnostic artifacts. Technical collection failures
 have their own required gate, while the real internal package can still run its
 independent native tests. The final aggregate rejects either failure. Installed
-toolchain notices are being collected for review; these diagnostic copies do not
-constitute a distribution approval or a new end-user license agreement.
+toolchain notices are reviewed against the actual selected inputs; diagnostic copies
+alone do not constitute distribution approval or a new end-user license agreement.
 
 No signing secrets or security exceptions are configured. An eventual unsigned
 download may trigger SmartScreen or local policy warnings; do not disable protections,
