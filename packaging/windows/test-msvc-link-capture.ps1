@@ -47,7 +47,9 @@ try{
   $actual=(Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant()
   if($record.exit_code -ne $successCode -or $record.arguments.Count -ne 1 -or $record.arguments[0] -ne "@$rsp"){throw 'MSVC_PROBE_ARGUMENT_OR_EXIT_DRIFT'}
   if($record.response_files.Count -ne 1 -or $record.response_files[0].sha256 -ne (Get-FileHash -LiteralPath $rsp -Algorithm SHA256).Hash.ToLowerInvariant()){throw 'MSVC_PROBE_RESPONSE_BYTES_DRIFT'}
-  if($record.output_path -ne $exe -or $record.output_sha256 -ne $actual -or $actual -ne $baseline){throw 'MSVC_PROBE_FINAL_BINARY_DRIFT'}
+  if($record.output_path -ne $exe){throw 'MSVC_PROBE_OUTPUT_PATH_DRIFT'}
+  if($record.output_sha256 -ne $actual){throw 'MSVC_PROBE_RECEIPT_HASH_DRIFT'}
+  if($actual -ne $baseline){throw 'MSVC_PROBE_BASELINE_HASH_DRIFT'}
   if($record.unresolved.Count -gt 0){throw 'MSVC_PROBE_RUNTIME_PARSE_UNRESOLVED'}
   $names=@($record.runtime_libraries | ForEach-Object {$_.name.ToLowerInvariant()})
   if('libcmt.lib' -notin $names -or 'libucrt.lib' -notin $names){throw 'MSVC_PROBE_STATIC_CRT_NOT_PROVEN'}
