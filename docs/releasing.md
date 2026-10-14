@@ -1,6 +1,6 @@
 # GridCraft-Next release status
 
-Modified on 2026-10-14 for the independent derivative. Automatic release, signing, shared upstream release jobs, and Pages deployment workflows are disabled. Only the read-only CI workflow is active. No GridCraft-Next binary release or installer validation is claimed.
+Modified on 2026-10-14 for the independent derivative. Automatic release, signing, shared upstream release jobs, and Pages deployment workflows are disabled. Only the read-only CI workflow is active. No GridCraft-Next binary release is available. The exact `b8d298390064b6ddcb55341b399164ef9eebf27a` runtime baseline passed actual hosted-Windows installation, native Rust GUI and complete installer lifecycle checks in [run 38593323401](https://github.com/xue-ding-e/GridCraft-Next/actions/runs/38593323401). Its internal-validation-only distribution gate correctly remained failed; final legal/toolchain evidence and a clean deliverable rebuild are pending.
 
 Local packaging scripts are being adapted for independent application IDs, installation paths and license inclusion. Their Windows/macOS/Linux/FreeBSD output still requires platform-specific validation before release. The macOS upstream branded Finder layout is not used.
 
@@ -39,6 +39,45 @@ copyright attribution and all embedded-font obligations are preserved. Missing t
 or an unreviewed inventory fingerprint block distribution. `-ValidationOnly` permits
 marked packages solely for in-runner tests; it cannot approve a public artifact.
 The final CI aggregation stays failed until every runtime and legal layer passes.
+Windows native checks run alongside the Linux quality gate after the inexpensive
+Windows script tests. The final `validation_result` job requires all three jobs;
+failure, cancellation, skipped or missing Linux results cannot be hidden by a
+successful Windows build. Any later publication or main promotion must require
+this exact-commit aggregate, not just one platform job.
+
+The schema-2 inventory binds the explicit target triple, the exact lockfile, original
+legal payload hashes, and each observed package's actual feature/target-kind
+instances. Both GUI and CLI root artifact scopes are included. Missing scope
+metadata fails collection; changes of target, feature set or target kind invalidate
+an earlier review. This is deliberately a conservative build-input inventory, not
+proof that every host tool or every library object was linked into the executable.
+The public reduced Cargo summary excludes local package paths, raw compiler source
+excerpts and build-script environment data.
+
+Pinned supplemental texts retain their original bytes, fixed source revisions,
+source-package identities and checksums. They cover actual Windows build inputs
+and the confirmed generated-code/font attributions; a package's SPDX expression
+alone does not replace an original copyright or notice. Windows checkout preserves
+those bytes through targeted `.gitattributes -text` rules. The additional IJG and
+font acknowledgments are visible in `NOTICE`. Collection and provenance checks are
+not a legal certification, and no approved review fingerprint is supplied yet.
+
+Windows validation pins Rust `1.99.0` (commit
+`b940084d7eb6a299eb4bfeb8e34901bc051e7ac4`). The selected, already installed
+Visual Studio/MSVC and Windows SDK versions and relevant file hashes are recorded.
+A linker wrapper forwards the real arguments and return status, adding only
+`/VERBOSE:LIB`; it records actual loaded static runtime libraries separately from
+libraries merely searched. Each final link output is matched to the GUI/CLI bytes.
+A tiny synthetic C fixture tests this wrapper before any large Rust build; the
+fixture is never executed and does not establish Rust GUI behavior.
+
+Raw linker output, response files, installation paths and developer-environment
+values stay runner-local. Only explicitly validated, path-free JSON and selected
+original legal texts enter diagnostic artifacts. Technical collection failures
+have their own required gate, while the real internal package can still run its
+independent native tests. The final aggregate rejects either failure. Installed
+toolchain notices are being collected for review; these diagnostic copies do not
+constitute a distribution approval or a new end-user license agreement.
 
 No signing secrets or security exceptions are configured. An eventual unsigned
 download may trigger SmartScreen or local policy warnings; do not disable protections,
