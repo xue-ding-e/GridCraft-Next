@@ -224,9 +224,13 @@ function Assert-AdvertisedShortcut([string] $Path, [string] $ProductCode, [strin
   try {
     $installer = New-Object -ComObject WindowsInstaller.Installer
     $record = $installer.ShortcutTarget($Path)
-    Assert-PackageCheck ($record.StringData(1) -ieq $ProductCode) 'Start Menu shortcut advertises another product.'
-    Assert-PackageCheck ($record.StringData(2) -ceq 'Main') 'Start Menu shortcut advertises another feature.'
-    $target = $installer.ComponentPath($ProductCode, $record.StringData(3))
+    Assert-PackageCheck ((Get-GridCraftMsiRecordProperty -Record $record -Name FieldCount) -eq 3) 'ShortcutTarget must return product, feature and component fields.'
+    $advertisedProduct = [string] (Get-GridCraftMsiRecordProperty -Record $record -Name StringData -Arguments @(1))
+    $advertisedFeature = [string] (Get-GridCraftMsiRecordProperty -Record $record -Name StringData -Arguments @(2))
+    $advertisedComponent = [string] (Get-GridCraftMsiRecordProperty -Record $record -Name StringData -Arguments @(3))
+    Assert-PackageCheck ($advertisedProduct -ieq $ProductCode) 'Start Menu shortcut advertises another product.'
+    Assert-PackageCheck ($advertisedFeature -ceq 'Main') 'Start Menu shortcut advertises another feature.'
+    $target = $installer.ComponentPath($ProductCode, $advertisedComponent)
     Assert-PackageCheck ($target -ieq $Executable) 'Start Menu shortcut targets another executable.'
   } finally { Release-ComObject $record; Release-ComObject $installer }
 }

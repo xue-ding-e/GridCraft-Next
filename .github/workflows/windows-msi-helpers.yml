@@ -1,0 +1,41 @@
+# Helper-only diagnostics. This never builds/installs the Rust application and is
+# not a distribution or full-repository validation gate.
+name: Windows MSI helper diagnostics
+on:
+  push:
+    branches: ['diagnostic/windows-msi-helpers']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: windows-msi-helpers-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  helpers:
+    name: Real WiX and COM helper regression only
+    runs-on: windows-2022
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Parse PowerShell and test version contracts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($file in Get-ChildItem packaging/windows -Filter '*.ps1' -Recurse) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref] $tokens, [ref] $errors) | Out-Null
+            if ($errors.Count -gt 0) { throw ($errors | Out-String) }
+          }
+          ./packaging/windows/test-version.ps1
+      - name: Build tiny MSI and test read-only COM consumers
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tools = "$env:RUNNER_TEMP\gridcraft-wix-script-tests"
+          dotnet tool install --tool-path $tools wix --version 5.0.2
+          if ($LASTEXITCODE -ne 0) { throw 'WiX test-tool installation failed' }
+          $env:PATH = $tools + ';' + $env:PATH
+          ./packaging/windows/test-msi-database.ps1

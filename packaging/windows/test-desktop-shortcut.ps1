@@ -11,6 +11,7 @@
 param([string] $WorkDir)
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot 'msi-database.ps1')
 
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') {
   throw 'This install test is restricted to disposable GitHub-hosted Windows runners.'
@@ -46,18 +47,13 @@ function Get-OptionalRegistryValue([string] $Path, [string] $Name) {
 function Get-ProductCode([string] $Msi) {
   $installer = New-Object -ComObject WindowsInstaller.Installer
   $database = $null
-  $view = $null
-  $record = $null
   try {
     $database = $installer.OpenDatabase($Msi, 0)
-    $view = $database.OpenView('SELECT `Value` FROM `Property` WHERE `Property` = ''ProductCode''')
-    $view.Execute()
-    $record = $view.Fetch()
-    if (-not $record) { throw "No ProductCode in $Msi" }
-    return $record.StringData(1)
+    $rows = @(Read-GridCraftMsiRows -Database $database -Sql 'SELECT `Value` FROM `Property` WHERE `Property` = ''ProductCode''' -Columns @('Value'))
+    if ($rows.Count -ne 1 -or [string]::IsNullOrWhiteSpace($rows[0].Value)) { throw "No unique ProductCode in $Msi" }
+    return $rows[0].Value
   } finally {
-    if ($view) { $view.Close() }
-    foreach ($item in $record, $view, $database, $installer) {
+    foreach ($item in $database, $installer) {
       if ($item) { [Runtime.InteropServices.Marshal]::FinalReleaseComObject($item) | Out-Null }
     }
   }
