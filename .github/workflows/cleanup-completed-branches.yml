@@ -1,0 +1,47 @@
+# One bounded maintenance operation, not a general branch deletion service.
+name: Archive completed initial-delivery branches
+on:
+  workflow_dispatch:
+    inputs:
+      maintenance_sha:
+        description: Exact reviewed maintenance commit, also the dispatch ref HEAD
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: gridcraft-next-completed-branch-cleanup
+  cancel-in-progress: false
+jobs:
+  cleanup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Require exact manual identity
+        env:
+          MAINTENANCE_SHA: ${{ inputs.maintenance_sha }}
+        run: |
+          [[ "$MAINTENANCE_SHA" =~ ^[0-9a-f]{40}$ ]] && [[ "$MAINTENANCE_SHA" == "$GITHUB_SHA" ]]
+          [[ "$GITHUB_REPOSITORY" == "xue-ding-e/GridCraft-Next" ]]
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.maintenance_sha }}
+          persist-credentials: false
+      - name: Test fixed scope, archive conflicts and atomic leases
+        run: python3 -m unittest discover -s scripts/tests -v
+      - name: Archive exact tips and atomically delete only unchanged completed refs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/cleanup_completed_branches.py \
+            --expected-main "$GITHUB_SHA" --output branch-recovery.json
+      - name: Preserve public restoration mapping
+        if: ${{ always() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: completed-branch-recovery-${{ github.sha }}
+          path: branch-recovery.json
+          if-no-files-found: warn
+          retention-days: 30
