@@ -30,13 +30,15 @@ class ValidationResultTests(unittest.TestCase):
         root = SCRIPT.parents[2]
         workflow = (root / ".github/workflows/ci.yml").read_text()
         harness = (SCRIPT.parent / "build-with-toolchain-evidence.ps1").read_text()
+        collection = (SCRIPT.parent / "collect-build-toolchain-evidence.ps1").read_text()
         self.assertIn("needs: [gate, windows_tests, windows_package]", workflow)
         self.assertIn("TOOLCHAIN_OUTCOME: ${{ steps.toolchain_evidence.outcome }}", workflow)
         self.assertIn("$env:NATIVE_OUTCOME, $env:TOOLCHAIN_OUTCOME", workflow)
         self.assertIn("$env:TOOLCHAIN_CAPTURE_COMPLETE -ne 'true'", workflow)
         self.assertIn("$captureComplete = $false", harness)
-        self.assertIn("$captureStatus -eq 0", harness)
-        self.assertIn("$technicalIssues.Count -eq 0", harness)
+        self.assertIn("collect-build-toolchain-evidence.ps1", harness)
+        self.assertIn("$captureStatus -eq 0", collection)
+        self.assertIn("$technicalIssues.Count -eq 0", collection)
         self.assertNotIn("continue-on-error:", workflow)
 
     def test_link_probe_clears_expected_failure_only_after_assertions(self):

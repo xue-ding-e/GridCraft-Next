@@ -1,0 +1,86 @@
+# Promotion only: this workflow never rebuilds or substitutes its own CI gates.
+# Its code and the successful producer run must be at exactly source_sha.
+name: GridCraft-Next reviewed Windows release
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Exact reviewed 40-character SHA, also the dispatch ref's HEAD
+        required: true
+        type: string
+      ci_run_id:
+        description: Completed successful GridCraft-Next CI run for this exact SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gridcraft-next-windows-release
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Read-only exact CI and final artifact verification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      artifact_id: ${{ steps.verify.outputs.artifact_id }}
+      artifact_digest: ${{ steps.verify.outputs.artifact_digest }}
+      attempt: ${{ steps.verify.outputs.attempt }}
+    steps:
+      - name: Require exact dispatch identity
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+        run: |
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]] && [[ "$SOURCE_SHA" == "$GITHUB_SHA" ]]
+          [[ "$CI_RUN_ID" =~ ^[1-9][0-9]*$ ]]
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.source_sha }}
+          persist-credentials: false
+      - name: Test release guards without credentials or network
+        run: python3 -m unittest discover -s packaging/windows/tests -p 'test_release*.py' -v
+      - name: Download and verify the exact complete CI producer artifact
+        id: verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+        run: |
+          python3 packaging/windows/publish_release.py verify \
+            --source-sha "$SOURCE_SHA" --ci-run-id "$CI_RUN_ID" --repository "$GITHUB_REPOSITORY"
+
+  publish:
+    name: Draft, upload, download-verify, then publish
+    needs: [verify]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    # Only this job obtains the existing ephemeral Actions token's write scope.
+    # No new credential, repository setting, secret, or workflow-wide write grant.
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.source_sha }}
+          persist-credentials: false
+      - name: Reverify provenance, create a fresh draft, verify downloads, publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+          ARTIFACT_ID: ${{ needs.verify.outputs.artifact_id }}
+          ARTIFACT_DIGEST: ${{ needs.verify.outputs.artifact_digest }}
+          CI_ATTEMPT: ${{ needs.verify.outputs.attempt }}
+        run: |
+          python3 packaging/windows/publish_release.py publish \
+            --source-sha "$SOURCE_SHA" --ci-run-id "$CI_RUN_ID" --repository "$GITHUB_REPOSITORY" \
+            --artifact-id "$ARTIFACT_ID" --artifact-digest "$ARTIFACT_DIGEST" --attempt "$CI_ATTEMPT"

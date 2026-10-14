@@ -7,31 +7,22 @@ $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
 $selection = Join-Path $env:RUNNER_TEMP 'gridcraft-toolchain-selection'
 $capture = Join-Path $env:RUNNER_TEMP 'gridcraft-link-capture'
-$collection = Join-Path $env:RUNNER_TEMP 'gridcraft-toolchain-collection'
 & (Join-Path $PSScriptRoot 'select-installed-msvc-sdk.ps1') -OutputDirectory $selection -ApplyToProcess
 & (Join-Path $PSScriptRoot 'enable-msvc-link-capture.ps1') -OutputDirectory $capture
 $packageFailure = $null
 $captureComplete = $false
 try {
-  & (Join-Path $PSScriptRoot 'package.ps1') -Arch x64 -ValidationOnly
+  & (Join-Path $PSScriptRoot 'package.ps1') -Arch x64 -ReviewedOrValidation
 } catch {
   $packageFailure = $_
 } finally {
   try {
-    & python (Join-Path $PSScriptRoot 'summarize-msvc-link-inputs.py') $capture `
-      --gui 'target/x86_64-pc-windows-msvc/release/gridcraft.exe' `
-      --cli 'target/x86_64-pc-windows-msvc/release/gridcraft-cli.exe'
-    $captureStatus = $LASTEXITCODE
-    $inputs = Get-Content -LiteralPath (Join-Path $capture 'private/collector-inputs.json') -Raw | ConvertFrom-Json
-    & (Join-Path $PSScriptRoot 'collect-installed-toolchain.ps1') -OutputDirectory $collection `
-      -RustToolchain '1.99.0-x86_64-pc-windows-msvc' `
-      -LinkedRuntimeLibraries @($inputs.linked_runtime_libraries) `
-      -LinkEvidenceFiles @($inputs.link_evidence_files)
-    $summary = Get-Content -LiteralPath (Join-Path $collection 'public/toolchain-summary.json') -Raw | ConvertFrom-Json
-    $technicalIssues = @($summary.unresolved | Where-Object { $_ -ne 'MICROSOFT_TERMS_APPLICABILITY_NOT_REVIEWED' })
-    # A human review of the exact collected legal texts is still outstanding. Every other
-    # collection problem, missing original, identity mismatch or unresolved link stays red.
-    $captureComplete = ($captureStatus -eq 0 -and @($summary.missing_files).Count -eq 0 -and $technicalIssues.Count -eq 0)
+    $targetRoot = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { Join-Path $PSScriptRoot '../../target' }
+    $collected = & (Join-Path $PSScriptRoot 'collect-build-toolchain-evidence.ps1') `
+      -BinaryDirectory (Join-Path $targetRoot 'x86_64-pc-windows-msvc/release') -SourceSha $env:GRIDCRAFT_BUILD_SHA
+    # The helper preserves the existing collection checks and never calls the
+    # new-directory-only collector twice. Its receipt is not legal approval.
+    $captureComplete = ($collected.capture_complete -is [bool] -and $collected.capture_complete -eq $true)
   } catch {
     Write-Warning 'Toolchain evidence is incomplete. Its separate gate will fail; details stay runner-local.'
   }

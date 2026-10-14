@@ -76,6 +76,35 @@ try {
   Record-File (Join-Path $doc 'COPYRIGHT-library.html') 'rust-std-original-notices' 'public-legal'
   # Only standard-library-related originals, not the full compiler/host copyright file.
   foreach($name in 'MIT.txt','Apache-2.0.txt','Unicode-3.0.txt') { Record-File (Join-Path $doc "licenses\$name") 'rust-std-original-license' 'public-legal' }
+  # Installed COPYRIGHT-library does not cover the fixed compiler-builtins subtree.
+  # Retain its original notices, tied to the exact rustc source commit and bytes.
+  $supplementRoot = Join-Path $PSScriptRoot 'toolchain-license-supplements'
+  $manifestPath = Join-Path $supplementRoot 'runtime-supplements.json'
+  $supplements = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+  if ($supplements.schema -ne 1 -or $supplements.applicable_rust_release -cne '1.99.0' -or
+      $supplements.applicable_rust_commit -cne $ExpectedRustCommit -or $supplements.target -cne $Target -or
+      @($supplements.files).Count -ne 2) { throw 'RUST_RUNTIME_SUPPLEMENT_IDENTITY_MISMATCH' }
+  $expectedNames = @('compiler-builtins-LICENSE.txt', 'libm-LICENSE.txt')
+  $seenSupplements = @{}
+  foreach ($item in $supplements.files) {
+    if ($item.file -cnotin $expectedNames -or $seenSupplements.ContainsKey($item.file) -or
+        $item.source_commit -cne $ExpectedRustCommit -or
+        $item.source_repository -cne 'https://github.com/rust-lang/rust' -or
+        -not $item.source_url.StartsWith("https://raw.githubusercontent.com/rust-lang/rust/$ExpectedRustCommit/", [StringComparison]::Ordinal) -or
+        $item.original_sha256 -cnotmatch '^[0-9a-f]{64}$' -or
+        $item.collector_role -cne 'rust-runtime-fixed-commit-license') { throw 'RUST_RUNTIME_SUPPLEMENT_SCOPE_MISMATCH' }
+    $seenSupplements[$item.file] = $true
+    $original = Join-Path $supplementRoot $item.file
+    $publicName = $item.original_sha256.Substring(0,16) + '-' + $item.file
+    if (-not (Test-Path -LiteralPath $original -PathType Leaf) -or
+        (Get-Item -LiteralPath $original).Length -ne $item.bytes -or
+        (Get-FileHash -LiteralPath $original -Algorithm SHA256).Hash.ToLowerInvariant() -cne $item.original_sha256 -or
+        $item.required_public_legal_basename -cne $publicName -or
+        $supplements.required_public_legal.$publicName -cne $item.original_sha256) { throw 'RUST_RUNTIME_SUPPLEMENT_BYTES_MISMATCH' }
+    Record-File $original 'rust-runtime-fixed-commit-license' 'public-legal'
+  }
+  # Bind source URLs/commit and the required map into the same reviewed fingerprint.
+  Record-File $manifestPath 'rust-runtime-supplement-manifest'
   foreach($name in 'LICENSE-MIT','LICENSE-APACHE','COPYRIGHT') {
     $p=Join-Path $doc $name; if(Test-Path -LiteralPath $p -PathType Leaf){Record-File $p 'rust-original-license-optional' 'public-legal'}
   }
