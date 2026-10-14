@@ -78,8 +78,18 @@ try {
   foreach ($line in $lines) {
     if ($line -match '^([^=]+)=(.*)$' -and $Matches[1] -in $allowed) { $selected[$Matches[1]] = $Matches[2] }
   }
+  # Diagnostic values are fixed key names and booleans/counts, never environment contents.
+  [IO.File]::WriteAllLines((Join-Path $private 'vcvars-whitelisted-stdout.txt'), [string[]]$lines)
+  $presence = [ordered]@{}
+  foreach ($required in 'PATH','LIB','INCLUDE','VCToolsInstallDir','VCToolsVersion','WindowsSdkDir','WindowsSDKVersion') {
+    $presence[$required] = [bool]$selected[$required]
+  }
+  Write-Output ('VCVARS_REQUIRED_PRESENCE=' + ($presence | ConvertTo-Json -Compress))
+  Write-Output ('VCVARS_LINE_COUNT=' + $lines.Count + ';PARSED_KEY_COUNT=' + $selected.Count)
+  $literal = @($lines | Where-Object { $_ -match '![A-Za-z_][A-Za-z0-9_]*!' }).Count -gt 0
+  Write-Output ('VCVARS_HAS_LITERAL_EXPANSIONS=' + $literal.ToString().ToLowerInvariant())
   foreach ($name in 'PATH','LIB','INCLUDE','VCToolsInstallDir','VCToolsVersion','WindowsSdkDir','WindowsSDKVersion') {
-    if (-not $selected[$name]) { throw 'VCVARS_REQUIRED_VALUE_MISSING' }
+    if (-not $selected[$name]) { throw ('VCVARS_REQUIRED_VALUE_MISSING_' + $name.ToUpperInvariant()) }
   }
   if ($selected['VCToolsVersion'].TrimEnd('\') -ne $vc.Name -or $selected['WindowsSDKVersion'].TrimEnd('\') -ne $sdk.Name) { throw 'VCVARS_SELECTED_VERSION_MISMATCH' }
   if ([IO.Path]::GetFullPath($selected['VCToolsInstallDir']).TrimEnd('\') -ne $vc.FullName.TrimEnd('\')) { throw 'VCVARS_SELECTED_VC_PATH_MISMATCH' }
