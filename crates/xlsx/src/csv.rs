@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use gridcraft_core::parse::parse_input;
+use gridcraft_core::parse::{Parsed, parse_input};
 use gridcraft_core::{CellRef, MAX_COLS, MAX_ROWS, Value};
 use gridcraft_model::{Cell, NumFmt, Sheet, StyleId, Workbook};
 
@@ -133,6 +133,18 @@ fn parse_records(text: &str, delim: char, quote: char, mut on_record: impl FnMut
     }
 }
 
+/// Bare decimal integers with leading zeros, or more than Excel's 15 significant digits,
+/// are commonly identifiers. CSV has no types, so keep their spelling instead of silently
+/// rounding them through f64. Explicit decimals/scientific notation retain numeric inference.
+fn preserve_integer_text(field: &str) -> bool {
+    let text = field.trim();
+    let digits = text.strip_prefix('+').or_else(|| text.strip_prefix('-')).unwrap_or(text);
+    if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return false;
+    }
+    digits.len() > 15 || (digits.len() > 1 && digits.starts_with('0'))
+}
+
 pub fn read_csv(bytes: &[u8], opts: &CsvOptions) -> Result<Workbook, IoError> {
     let text = decode_text(bytes);
     let quote = if opts.quote == 0 { '"' } else { opts.quote as char };
@@ -161,7 +173,13 @@ pub fn read_csv(bytes: &[u8], opts: &CsvOptions) -> Result<Workbook, IoError> {
             }
             let pos = CellRef::new(row, col as u32);
             let cell = if opts.parse_values {
-                let p = parse_input(&f, opts.date_system);
+                let p = if preserve_integer_text(&f) {
+                    // A text number format also protects a later ordinary cell edit. The format
+                    // cache below interns one style for all such fields, even in large files.
+                    Parsed { value: Value::text(f.as_str()), format: Some("@") }
+                } else {
+                    parse_input(&f, opts.date_system)
+                };
                 let style = match p.format {
                     Some(code) => match fmt_cache.iter().find(|(c, _)| *c == code) {
                         Some((_, id)) => *id,

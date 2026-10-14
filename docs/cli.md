@@ -59,6 +59,36 @@ gridcraft-cli run --in book.xlsx \
 
 Command ids and parameters: `gridcraft-cli commands`.
 
+### Identifiers and numeric input
+
+CSV's default type inference preserves bare decimal integers with more than 15 digits, or
+with leading zeros, as text. An optional `+` or `-` sign is allowed; the original field spelling,
+including surrounding whitespace, is retained. These inferred identifier cells share a Text
+(`@`) number format so later string edits remain text. Ordinary integers, decimals and explicit
+scientific notation still use the spreadsheet's `f64` numeric model; this is not arbitrary-precision
+numeric import. This inference does not change existing XLSX values or general manual input.
+
+For identifier columns that will receive new rows or pasted values, configure the **whole column**
+as Text before editing. Per-cell formats from a CSV import do not constitute a column schema:
+
+```sh
+gridcraft-cli run --in data.csv \
+  --cmd 'home.numberFormat={"range":"D:E,I:I","format":"Text"}' \
+  --cmd 'home.insertRows={"rows":"3:3"}' \
+  --cmd 'range.setValues={"range":"D3","values":[["990000000000000099","00000000099"]]}' \
+  --cmd 'cell.set={"cell":"I3","input":"000000000000000099"}' \
+  --out edited.xlsx
+```
+
+The identifiers above are synthetic. Text column formats apply to string input from `cell.set`,
+`range.setValues` and external text `edit.paste`, including new rows, and persist in XLSX. CSV
+cannot store column formats or formulas, so use XLSX for a workbook that must retain them.
+
+`range.setValues` respects explicit JSON types: JSON numbers become numeric `f64` values and
+booleans remain booleans, even in a Text-formatted column. Send identifiers as **JSON strings**,
+not numbers; a number already rounded by a caller cannot be reconstructed from its displayed text.
+Text formatting does not retroactively recover digits lost before import.
+
 ## `check`
 
 ```sh

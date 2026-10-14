@@ -48,6 +48,74 @@ fn values_and_formats() {
 }
 
 #[test]
+fn csv_auto_values_keep_identifier_integers_exact() {
+    // These are synthetic identifiers, with deliberately invalid regions and dates.
+    let cases = [
+        "990000000000000001",
+        "9999999999999999",
+        "000000000000000123",
+        "007",
+        "00",
+        "+00123",
+        "-00123",
+        "+990000000000000001",
+        "-990000000000000001",
+        "  990000000000000001  ",
+        "\u{a0}000123\u{a0}",
+        "99000000000000000X",
+        "１２３４５６７８９０１２３４５６７８",
+    ];
+    for text in cases {
+        let wb = read_csv(text.as_bytes(), &CsvOptions::default()).unwrap();
+        assert_eq!(v(&wb, 0, 0), Value::text(text), "identifier was inferred as numeric: {text:?}");
+        let sh = wb.active().unwrap();
+        let bytes = write_csv(sh, b',', |c| sh.value(c).as_text().unwrap().to_string()).unwrap();
+        let reopened = read_csv(&bytes, &CsvOptions::default()).unwrap();
+        assert_eq!(v(&reopened, 0, 0), Value::text(text), "CSV round trip changed identifier: {text:?}");
+    }
+}
+
+#[test]
+fn csv_identifier_protection_keeps_ordinary_numbers_numeric() {
+    for (text, expected) in [
+        ("0", 0.0),
+        ("-0", 0.0),
+        ("+0", 0.0),
+        ("42", 42.0),
+        ("-42", -42.0),
+        ("+42", 42.0),
+        ("999999999999999", 999999999999999.0),
+        ("12.50", 12.5),
+        ("-12.50", -12.5),
+        ("0.01", 0.01),
+        ("0012.50", 12.5),
+        ("1.25e3", 1250.0),
+        ("1e18", 1e18),
+        (" 42 ", 42.0),
+    ] {
+        let wb = read_csv(text.as_bytes(), &CsvOptions::default()).unwrap();
+        assert_eq!(v(&wb, 0, 0), Value::Number(expected), "ordinary numeric input changed: {text}");
+    }
+    // Quoting does not itself specify a text column; explicit numeric syntax retains the
+    // existing parser's behaviour. Long decimal/scientific input remains floating-point.
+    let wb = read_csv(b"\"1,234\",50%,$5.00", &CsvOptions::default()).unwrap();
+    assert_eq!(v(&wb, 0, 0), Value::Number(1234.0));
+    assert_eq!(v(&wb, 0, 1), Value::Number(0.5));
+    assert_eq!(v(&wb, 0, 2), Value::Number(5.0));
+}
+
+#[test]
+fn csv_identifier_text_formats_share_one_style() {
+    let csv = (0..1000).map(|n| format!("990000000000{n:06}\n")).collect::<String>();
+    let wb = read_csv(csv.as_bytes(), &CsvOptions::default()).unwrap();
+    let sh = wb.active().unwrap();
+    let style = sh.style_id(CellRef::new(0, 0));
+    assert_eq!(wb.styles.get(style).num_fmt.as_str(), "@");
+    assert!(sh.cells.iter().all(|(_, cell)| cell.style == style));
+    assert_eq!(wb.styles.len(), 2, "one default style and one shared text style");
+}
+
+#[test]
 fn encodings() {
     let mut b = vec![0xEF, 0xBB, 0xBF];
     b.extend_from_slice("é,x".as_bytes());
