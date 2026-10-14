@@ -68,6 +68,15 @@ jobs:
             if ($errors.Count -gt 0) { throw ($errors | Out-String) }
           }
           ./packaging/windows/test-version.ps1
+      - name: Test real WiX MSI and COM readers before compiling Rust
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tools = "$env:RUNNER_TEMP\gridcraft-wix-script-tests"
+          dotnet tool install --tool-path $tools wix --version 5.0.2
+          if ($LASTEXITCODE -ne 0) { throw 'WiX test-tool installation failed' }
+          $env:PATH = $tools + ';' + $env:PATH
+          ./packaging/windows/test-msi-database.ps1
       - name: Test Python validation helpers
         shell: pwsh
         run: |

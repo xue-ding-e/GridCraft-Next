@@ -18,6 +18,7 @@ if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
   throw 'Reading MSI tables through WindowsInstaller COM requires Windows.'
 }
 . (Join-Path $PSScriptRoot 'version.ps1')
+. (Join-Path $PSScriptRoot 'msi-database.ps1')
 $expectedVersion = ConvertTo-GridCraftMsiVersion $FullVersion
 $nextUpgradeCode = [guid] '73F9F3B2-548C-4F5B-8934-253B3C29E0B1'
 $upstreamUpgradeCode = [guid] '5511327B-F305-41BE-92D0-EB84944E7C4D'
@@ -28,28 +29,6 @@ function Assert-Msi([bool] $Condition, [string] $Message) {
   if (-not $Condition) { throw $Message }
 }
 
-function Read-MsiRows($Database, [string] $Sql, [string[]] $Columns) {
-  $view = $null
-  $record = $null
-  try {
-    $view = $Database.OpenView($Sql)
-    $view.Execute()
-    while ($null -ne ($record = $view.Fetch())) {
-      try {
-        $row = [ordered]@{}
-        for ($i = 0; $i -lt $Columns.Length; $i++) { $row[$Columns[$i]] = $record.StringData($i + 1) }
-        [pscustomobject] $row
-      } finally {
-        [Runtime.InteropServices.Marshal]::FinalReleaseComObject($record) | Out-Null
-        $record = $null
-      }
-    }
-  } finally {
-    if ($view) {
-      try { $view.Close() } finally { [Runtime.InteropServices.Marshal]::FinalReleaseComObject($view) | Out-Null }
-    }
-  }
-}
 
 $installer = $null
 $database = $null
@@ -58,7 +37,7 @@ try {
   $installer = New-Object -ComObject WindowsInstaller.Installer
   $database = $installer.OpenDatabase($path, 0) # msiOpenDatabaseModeReadOnly
   $properties = @{}
-  foreach ($row in Read-MsiRows $database 'SELECT `Property`, `Value` FROM `Property`' @('Property', 'Value')) {
+  foreach ($row in Read-GridCraftMsiRows $database 'SELECT `Property`, `Value` FROM `Property`' @('Property', 'Value')) {
     $properties[$row.Property] = $row.Value
   }
   Assert-Msi ($properties.ProductVersion -ceq $expectedVersion) 'MSI ProductVersion does not match the authoritative SemVer encoding'
@@ -70,7 +49,7 @@ try {
   Assert-Msi ([guid] $properties.ProductCode -ne [guid]::Empty) 'MSI must have a valid ProductCode'
   Assert-Msi (($properties.SecureCustomProperties -split ';') -ccontains $detectionProperty) 'Same-version detection property is not secure across elevation'
 
-  $upgrades = @(Read-MsiRows $database 'SELECT `UpgradeCode`, `VersionMin`, `VersionMax`, `Language`, `Attributes`, `ActionProperty` FROM `Upgrade`' @('UpgradeCode', 'VersionMin', 'VersionMax', 'Language', 'Attributes', 'ActionProperty'))
+  $upgrades = @(Read-GridCraftMsiRows $database 'SELECT `UpgradeCode`, `VersionMin`, `VersionMax`, `Language`, `Attributes`, `ActionProperty` FROM `Upgrade`' @('UpgradeCode', 'VersionMin', 'VersionMax', 'Language', 'Attributes', 'ActionProperty'))
   foreach ($row in $upgrades) {
     Assert-Msi ([guid] $row.UpgradeCode -eq $nextUpgradeCode) 'Upgrade table targets a product outside the independent Next family'
   }
@@ -93,13 +72,13 @@ try {
   Assert-Msi (([int] $newer[0].Attributes -band 2) -ne 0) 'Newer versions must only be detected'
   Assert-Msi (([int] $newer[0].Attributes -band 256) -eq 0) 'Downgrade detection must exclude the equal version'
 
-  $launches = @(Read-MsiRows $database 'SELECT `Condition`, `Description` FROM `LaunchCondition`' @('Condition', 'Description'))
+  $launches = @(Read-GridCraftMsiRows $database 'SELECT `Condition`, `Description` FROM `LaunchCondition`' @('Condition', 'Description'))
   $sameVersionLaunch = @($launches | Where-Object { $_.Condition -ceq $guard })
   Assert-Msi ($sameVersionLaunch.Count -eq 1) 'Missing equal-version guard or original-MSI maintenance exemption'
   Assert-Msi (-not [string]::IsNullOrWhiteSpace($sameVersionLaunch[0].Description)) 'Equal-version guard has no explanation'
   Assert-Msi (@($launches | Where-Object { $_.Condition -match 'WIX_DOWNGRADE_DETECTED' }).Count -eq 1) 'Missing downgrade launch condition'
   foreach ($table in 'InstallUISequence', 'InstallExecuteSequence') {
-    $rows = @(Read-MsiRows $database ('SELECT `Action`, `Sequence`, `Condition` FROM `' + $table + '`') @('Action', 'Sequence', 'Condition'))
+    $rows = @(Read-GridCraftMsiRows $database ('SELECT `Action`, `Sequence`, `Condition` FROM `' + $table + '`') @('Action', 'Sequence', 'Condition'))
     $find = @($rows | Where-Object { $_.Action -ceq 'FindRelatedProducts' })
     $launch = @($rows | Where-Object { $_.Action -ceq 'LaunchConditions' })
     Assert-Msi ($find.Count -eq 1 -and $launch.Count -eq 1) "$table is missing required standard actions"

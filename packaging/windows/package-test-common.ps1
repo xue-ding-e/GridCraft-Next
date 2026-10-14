@@ -1,5 +1,6 @@
 # Shared read-only inspection and bounded-process helpers for the disposable Windows gate.
 # This file has no install, download, cleanup, or environment-changing side effects when loaded.
+. (Join-Path $PSScriptRoot 'msi-database.ps1')
 function Assert-PackageCheck([bool] $Condition, [string] $Message) {
   if (-not $Condition) { throw $Message }
 }
@@ -26,24 +27,6 @@ function Release-ComObject($Value) {
   }
 }
 
-function Read-PackageRows($Database, [string] $Sql, [string[]] $Columns) {
-  $view = $null
-  try {
-    $view = $Database.OpenView($Sql)
-    $view.Execute()
-    while ($null -ne ($record = $view.Fetch())) {
-      try {
-        $row = [ordered]@{}
-        for ($index = 0; $index -lt $Columns.Length; $index++) {
-          $row[$Columns[$index]] = $record.StringData($index + 1)
-        }
-        [pscustomobject] $row
-      } finally { Release-ComObject $record }
-    }
-  } finally {
-    if ($null -ne $view) { try { $view.Close() } finally { Release-ComObject $view } }
-  }
-}
 
 function Read-PackageDatabase([string] $Path) {
   $installer = $null
@@ -51,9 +34,9 @@ function Read-PackageDatabase([string] $Path) {
   try {
     $installer = New-Object -ComObject WindowsInstaller.Installer
     $database = $installer.OpenDatabase((Resolve-Path -LiteralPath $Path).Path, 0) # Read-only.
-    $tableNames = @(Read-PackageRows $database 'SELECT `Name` FROM `_Tables`' @('Name') | ForEach-Object { $_.Name })
+    $tableNames = @(Read-GridCraftMsiRows $database 'SELECT `Name` FROM `_Tables`' @('Name') | ForEach-Object { $_.Name })
     $data = [ordered]@{ Path = (Resolve-Path -LiteralPath $Path).Path; Properties = @{}; Tables = @{} }
-    foreach ($row in Read-PackageRows $database 'SELECT `Property`, `Value` FROM `Property`' @('Property', 'Value')) {
+    foreach ($row in Read-GridCraftMsiRows $database 'SELECT `Property`, `Value` FROM `Property`' @('Property', 'Value')) {
       $data.Properties[$row.Property] = $row.Value
     }
     $columnsByTable = [ordered]@{
@@ -76,7 +59,7 @@ function Read-PackageDatabase([string] $Path) {
       if ($tableNames -ccontains $name) {
         $columns = $columnsByTable[$name]
         $quoted = @($columns | ForEach-Object { '`' + $_ + '`' }) -join ', '
-        $data.Tables[$name] = @(Read-PackageRows $database ('SELECT ' + $quoted + ' FROM `' + $name + '`') $columns)
+        $data.Tables[$name] = @(Read-GridCraftMsiRows $database ('SELECT ' + $quoted + ' FROM `' + $name + '`') $columns)
       }
     }
     return [pscustomobject] $data
