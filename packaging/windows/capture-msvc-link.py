@@ -71,7 +71,7 @@ def expand_args(args, directory, receipts, depth=0):
     return result
 
 def loaded_runtime_paths(text):
-    """Conservative MS LINK English /VERBOSE:LIB parser; never equate 'searched' with loaded.
+    """Conservative MS LINK English /VERBOSE parser; never equate 'searched' with loaded.
 
 A basename-only Loaded record is accepted only under a matching full-path Searching
 record. A full-path Loaded record is accepted directly. Ambiguity remains unresolved.
@@ -129,9 +129,11 @@ def main():
         record['unresolved'].append('RESPONSE_ARGUMENT_CAPTURE_FAILED')
     # This is a child-process-only message-language selection, never an environment dump.
     os.environ['VSLANG'] = '1033'
+    # /VERBOSE:LIB reports searches only on the selected linker; full /VERBOSE
+    # also proves loaded members. Never infer a loaded runtime from a search.
     log = directory / 'link.log'
     with log.open('wb') as stream:
-        result = subprocess.run([str(linker), *args, '/VERBOSE:LIB'], stdout=stream, stderr=subprocess.STDOUT, check=False)
+        result = subprocess.run([str(linker), *args, '/VERBOSE'], stdout=stream, stderr=subprocess.STDOUT, check=False)
     record['exit_code'] = result.returncode
     record['link_log'] = str(log)
     try:
