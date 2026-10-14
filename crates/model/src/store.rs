@@ -159,6 +159,32 @@ impl CellStore {
         let keys: Vec<CellRef> = self.iter_range(r).map(|(c, _)| c).collect();
         keys.into_iter().filter_map(|c| self.remove(c).map(|cell| (c, cell))).collect()
     }
+    /// Rebuilds the affected bands once, moving whole row maps rather than individual cells.
+    /// Rows before `from` are retained unchanged; `map` returns each later row's new index or
+    /// `None` to delete it. The surviving mapping, including the unchanged prefix, must be
+    /// injective and order-preserving: mapped rows must not overwrite retained prefix rows.
+    /// Shared bands are copied at most once and the untouched prefix remains shared.
+    pub fn remap_rows_from(&mut self, from: u32, map: impl Fn(u32) -> Option<u32>) {
+        if from >= gridcraft_core::MAX_ROWS {
+            return;
+        }
+        let tail = self.bands.split_off(&(from / BAND));
+        self.len = self.bands.values().flat_map(|band| band.rows.values()).map(BTreeMap::len).sum();
+        for (_, shared) in tail {
+            let band = Arc::try_unwrap(shared).unwrap_or_else(|shared| (*shared).clone());
+            for (row, cells) in band.rows {
+                let next = if row < from { Some(row) } else { map(row) };
+                let Some(next) = next.filter(|r| *r < gridcraft_core::MAX_ROWS) else { continue };
+                let count = cells.len();
+                let dest = Arc::make_mut(self.bands.entry(next / BAND).or_default());
+                if let Some(replaced) = dest.rows.insert(next, cells) {
+                    self.len = self.len.saturating_sub(replaced.len());
+                }
+                self.len = self.len.saturating_add(count);
+            }
+        }
+    }
+
     /// Rows strictly greater than or equal to `from` moved by `delta` (positive = down). Rows that
     /// would land before `from`... callers delete the vacated block first.
     pub fn shift_rows(&mut self, from: u32, delta: i64) {
@@ -267,6 +293,29 @@ mod tests {
         s.set(c(500, 0), Cell::value(4.0.into()));
         let v: Vec<f64> = s.iter_range(RangeRef::parse("A1:D100").unwrap()).map(|(_, x)| x.value.as_f64().unwrap()).collect();
         assert_eq!(v, [1.0, 2.0, 3.0]);
+    }
+
+    #[test]
+    fn row_remap_keeps_shared_prefix_and_snapshot_and_counts_survivors() {
+        let mut s = CellStore::new();
+        for row in [0, 63, 64, 100, 129, gridcraft_core::MAX_ROWS - 1] {
+            s.set(c(row, 0), Cell::value(Value::text(format!("{row:018}"))));
+        }
+        let before = s.clone();
+        s.remap_rows_from(100, |row| if row == 100 || row == 129 { None } else { Some(row - if row > 129 { 2 } else { 1 }) });
+        assert_eq!(before.len(), 6);
+        assert_eq!(s.len(), 4);
+        assert!(Arc::ptr_eq(s.bands.get(&0).unwrap(), before.bands.get(&0).unwrap()));
+        assert!(s.get(c(100, 0)).is_none());
+        assert!(s.get(c(129, 0)).is_none());
+        assert_eq!(s.get(c(gridcraft_core::MAX_ROWS - 3, 0)), before.get(c(gridcraft_core::MAX_ROWS - 1, 0)));
+        let unchanged = s.clone();
+        s.remap_rows_from(gridcraft_core::MAX_ROWS, |_| None);
+        assert_eq!(s, unchanged);
+        s.remap_rows_from(0, |_| None);
+        assert!(s.is_empty());
+        assert!(s.bands.is_empty());
+        assert_eq!(before.len(), 6);
     }
 
     #[test]

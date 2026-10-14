@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use gridcraft_core::{CellRef, MAX_COLS, MAX_ROWS, RangeRef};
+use gridcraft_core::{CellRef, MAX_COLS, MAX_ROWS, RangeRef, Value};
 use gridcraft_formula::adjust::{Axis, Edit};
 use gridcraft_model::{Anchor, AnchorMode, Sheet, Visibility};
 use serde_json::{Value as Json, json};
@@ -325,6 +325,159 @@ fn delete_areas(s: &Session, p: &Json, axis: Axis) -> Result<Vec<(u32, u32)>> {
     Ok(merged.into_iter().rev().map(|(a, b)| (a, b - a + 1)).collect())
 }
 
+/// A bounded rank map for a union of row deletions in the original sheet's coordinates.
+/// `rank[r]` is the number of deleted rows strictly before boundary `r`. Building the map
+/// for normalized disjoint intervals costs at most one worksheet's rows (about 4 MiB),
+/// independent of the number of cells.
+/// Subtracting the rank maps surviving rows injectively and in their original order.
+struct RowDeleteMap {
+    rank: Vec<u32>,
+}
+
+impl RowDeleteMap {
+    fn new(areas: &[(u32, u32)]) -> Self {
+        let mut rank = vec![0u32; MAX_ROWS as usize + 1];
+        for &(at, count) in areas {
+            let end = at.saturating_add(count).min(MAX_ROWS);
+            if at < end
+                && let Some(rows) = rank.get_mut(at as usize + 1..=end as usize)
+            {
+                rows.fill(1);
+            }
+        }
+        let mut removed = 0;
+        for count in &mut rank {
+            removed += *count;
+            *count = removed;
+        }
+        Self { rank }
+    }
+
+    fn row(&self, row: u32) -> Option<u32> {
+        let before = *self.rank.get(row as usize)?;
+        let after = *self.rank.get(row.checked_add(1)? as usize)?;
+        (before == after).then(|| row.saturating_sub(before))
+    }
+
+    fn range(&self, r: RangeRef) -> Option<RangeRef> {
+        let end = r.end.row.checked_add(1)?;
+        let start = r.start.row.checked_sub(*self.rank.get(r.start.row as usize)?)?;
+        let end = end.checked_sub(*self.rank.get(end as usize)?)?;
+        (start < end).then(|| RangeRef::new(CellRef::new(start, r.start.col), CellRef::new(end - 1, r.end.col)))
+    }
+}
+
+/// Accept only the canonical, reference-free CT_FileVersion fragment emitted by the XLSX
+/// reader (`passthrough::FILE_VERSION_ATTRS` and `xml::esc_attr`). Do not trust a slot label
+/// alone: unknown attributes, child elements, duplicate attributes or other XML stay opaque.
+fn plain_file_version_xml(xml: &str) -> bool {
+    let Some(mut rest) = xml.strip_prefix("<fileVersion") else { return false };
+    for prefix in [" appName=\"", " lastEdited=\"", " lowestEdited=\"", " rupBuild=\"", " codeName=\""] {
+        if let Some(value) = rest.strip_prefix(prefix) {
+            let Some((value, tail)) = value.split_once('"') else { return false };
+            let mut chunks = value.split('&');
+            let plain = |text: &str| {
+                text.chars().all(|c| {
+                    !matches!(c, '<' | '>' | '"') && matches!(c, '\u{20}'..='\u{D7FF}' | '\u{E000}'..='\u{FFFD}' | '\u{10000}'..='\u{10FFFF}')
+                })
+            };
+            if !chunks.next().is_some_and(plain) {
+                return false;
+            }
+            for chunk in chunks {
+                let Some((entity, text)) = chunk.split_once(';') else { return false };
+                if !matches!(entity, "amp" | "lt" | "gt" | "quot" | "#10" | "#13" | "#9") || !plain(text) {
+                    return false;
+                }
+            }
+            rest = tail;
+        }
+    }
+    rest == "/>"
+}
+
+fn plain_workbook_metadata(p: &gridcraft_model::Preserved) -> bool {
+    let gridcraft_model::Preserved { package_rels, rels, parts, elements, vml, sheets } = p;
+    package_rels.is_empty()
+        && rels.is_empty()
+        && parts.is_empty()
+        && vml.is_none()
+        && sheets.is_empty()
+        && elements.len() <= 1
+        && elements.iter().all(|e| e.slot == "fileVersion" && plain_file_version_xml(&e.xml))
+}
+
+/// The first bulk-delete path deliberately covers plain data only. Reference-bearing features
+/// anywhere in the workbook may point into the target sheet, so checking only that sheet would
+/// silently leave cross-sheet references stale. Rich workbooks keep the general edit path.
+fn can_batch_delete_rows(wb: &gridcraft_model::Workbook, sheet: usize, areas: &[(u32, u32)]) -> bool {
+    if !wb.names.is_empty() || wb.vba_project.is_some() || wb.preserved.as_ref().is_some_and(|p| !plain_workbook_metadata(p)) {
+        return false;
+    }
+    for sh in &wb.sheets {
+        if !sh.tables.is_empty()
+            || !sh.cond_formats.is_empty()
+            || !sh.validations.is_empty()
+            || !sh.charts.is_empty()
+            || !sh.sparklines.is_empty()
+            || !sh.pivots.is_empty()
+            || !sh.slicers.is_empty()
+            || !sh.hyperlinks.is_empty()
+            || !sh.spill.is_empty()
+            || !sh.spill_ranges.is_empty()
+            || sh.preserved.as_ref().is_some_and(|p| !p.is_empty())
+            || sh.cells.iter().any(|(at, cell)| !at.is_valid() || cell.formula.is_some() || matches!(cell.value, Value::Array(_)))
+        {
+            return false;
+        }
+    }
+    let Some(sh) = wb.sheet(sheet) else { return false };
+    if !sh.merges.is_empty()
+        || !sh.cell_pictures.is_empty()
+        || !sh.comments.is_empty()
+        || !sh.images.is_empty()
+        || !sh.shapes.is_empty()
+        || !sh.edit_ranges.is_empty()
+        || sh.protection.is_some()
+        || sh.freeze.is_some()
+        || sh.print.print_area.is_some()
+        || sh.print.title_rows.is_some()
+        || sh.print.title_cols.is_some()
+        || !sh.print.row_breaks.is_empty()
+        || !sh.print.col_breaks.is_empty()
+        || sh.rows.keys().any(|row| *row >= MAX_ROWS)
+        || sh.cols.keys().any(|col| *col >= MAX_COLS)
+        || sh.rows.values().chain(sh.cols.values()).any(|line| line.outline != 0 || line.collapsed)
+    {
+        return false;
+    }
+    // An AutoFilter and ordinary hidden/size/style row metadata are part of the plain-data
+    // workflow. Keep the header; its criteria and column offsets then need no rewriting.
+    if let Some(af) = &sh.autofilter
+        && (!af.range.start.is_valid()
+            || !af.range.end.is_valid()
+            || af.range.start.row > af.range.end.row
+            || af.range.start.col > af.range.end.col
+            || areas.iter().any(|&(at, count)| at <= af.range.start.row && af.range.start.row < at.saturating_add(count)))
+    {
+        return false;
+    }
+    true
+}
+
+fn batch_delete_plain_rows(sh: &mut Sheet, areas: &[(u32, u32)]) {
+    let Some(first) = areas.iter().map(|(at, _)| *at).min() else { return };
+    let map = RowDeleteMap::new(areas);
+    sh.cells.remap_rows_from(first, |row| map.row(row));
+    sh.rows = std::mem::take(&mut sh.rows).into_iter().filter_map(|(row, info)| map.row(row).map(|next| (next, info))).collect();
+    if let Some(af) = sh.autofilter.as_mut() {
+        // Eligibility excludes deletion of the filter header, so this range always survives.
+        if let Some(range) = map.range(af.range) {
+            af.range = range;
+        }
+    }
+}
+
 fn delete_lines(s: &mut Session, p: &Json, axis: Axis) -> Result<Json> {
     let areas = delete_areas(s, p, axis)?;
     for &(at, count) in &areas {
@@ -334,6 +487,14 @@ fn delete_lines(s: &mut Session, p: &Json, axis: Axis) -> Result<Json> {
     let out = edit(s, |cx| {
         let name = cx.wb.sheet(sheet).map(|s| s.name.clone()).unwrap_or_default();
         cx.protection_checked = true;
+        // Keep a single-span edit on the established path. Several scattered spans otherwise
+        // repeatedly move the same tail and scan every formula. Plain-data workbooks can use
+        // one row remap, still inside this edit's single undo/recalc transaction.
+        if axis == Axis::Rows && areas.len() > 1 && can_batch_delete_rows(&cx.wb, sheet, &areas) {
+            batch_delete_plain_rows(cx.sheet_mut(sheet)?, &areas);
+            cx.structural = true;
+            return Ok(Json::Null);
+        }
         // Last area first, so the earlier ones keep their positions.
         for (at, count) in areas {
             {
@@ -1076,3 +1237,7 @@ pub(crate) fn check_table_shift(sh: &Sheet, e: &Edit) -> Result<()> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+#[path = "sheet_bulk_tests.rs"]
+mod bulk_tests;
