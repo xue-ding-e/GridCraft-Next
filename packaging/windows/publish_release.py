@@ -236,7 +236,15 @@ def release_body(manifest, artifact):
             "No signing certificate, SmartScreen reputation, non-admin UAC, or Windows 10/11 hardware certification is claimed.\n\n"
             "The original full source gate and hosted Windows x64 real Rust GUI/CLI, install, repair, upgrade/downgrade, "
             "coexistence and uninstall gates passed for these exact bytes. RELEASE-EVIDENCE.json records their bounded evidence. "
-            "GridCraft-Next is an independent derivative, not an upstream GridCraft release.\n")
+            "GridCraft-Next is an independent derivative, not an upstream GridCraft release.\n\n"
+            "Microsoft runtime scope: these Windows binaries embed the release static C runtime components "
+            "libcmt/libvcruntime and Universal C Runtime. Acquisition, installation, use and redistribution "
+            "of those Microsoft components are subject to the applicable original Microsoft terms included "
+            "in both packages: Visual-Studio-2022-Enterprise-Professional-License-EN.docx and sdk_license.rtf. "
+            "Read WINDOWS-RUNTIME-LICENSE-NOTICE.txt for scope. The project's MIT/Apache-2.0 source licensing "
+            "and other open-source component licenses are unchanged; the Microsoft components are not relicensed under them.\n"
+            "Official terms: https://learn.microsoft.com/en-us/legal/windows-sdk/license and "
+            "https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Visual-Studio-2022-Enterprise-Professional-License-EN.docx\n")
 
 
 def verify_uploaded_assets(api, base, release_id, bundle, tag, public=False):

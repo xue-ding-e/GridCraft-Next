@@ -1,0 +1,28 @@
+WINDOWS RUNTIME TERMS
+
+Scope
+The GridCraft-Next Windows GUI and command-line executables contain embedded
+Microsoft release static C runtime code: libcmt and libvcruntime from MSVC
+14.44.35207, and the Universal C Runtime (libucrt) from Windows SDK
+10.0.26100.0. No standalone runtime .lib files or development tools are included.
+
+Original Microsoft terms
+For these embedded Microsoft components, acquisition, installation, use and
+redistribution are subject to the applicable provisions of the original
+Microsoft terms included in this package:
+
+- Visual-Studio-2022-Enterprise-Professional-License-EN.docx
+  Microsoft Visual Studio 2022 Enterprise / Professional terms, including
+  Section 5 (Distributable Code).
+- sdk_license.rtf
+  Microsoft Windows SDK terms, including Section 2(a) (Distributable Code).
+
+Please read the accompanying originals. This notice identifies their scope;
+it does not replace them or add terms or restrictions.
+
+Open-source components
+The project's source-code licensing is unchanged. Portions offered under
+MIT OR Apache-2.0 remain under those licenses; see LICENSE-MIT and
+LICENSE-APACHE. Other third-party components retain their respective licenses
+and notices. The embedded Microsoft components are not relicensed under the
+project's MIT or Apache-2.0 licenses.

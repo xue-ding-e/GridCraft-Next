@@ -47,7 +47,10 @@ function Record-File([string] $Path,[string] $Role,[ValidateSet('none','private'
   $hash=(Get-FileHash -LiteralPath $f.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
   $copyName=$null
   if ($Copy -ne 'none') {
-    if ($Copy -eq 'public-legal' -and ($f.Extension -notin '.txt','.rtf','.html','.htm','.md','' -or $f.Length -gt 8MB -or $f.Name -notmatch '(?i)license|eula|redist|third.?party|notice|copyright|^MIT\.txt$|^Apache-2\.0\.txt$|^Unicode-3\.0\.txt$')) { Add-Issue 'LEGAL_FILE_TYPE_REQUIRES_REVIEW' $f.FullName; return }
+    # Narrow exception for this byte-identical official Microsoft license only.
+    $pinnedDocument = ($f.Name -ceq 'Visual-Studio-2022-Enterprise-Professional-License-EN.docx' -and
+      $f.Length -eq 63513 -and $hash -ceq '9c0cd52b20db9d081854c75bd1b50c75514b8f8cb09c8cad15e89d90b97b5bf3')
+    if ($Copy -eq 'public-legal' -and -not $pinnedDocument -and ($f.Extension -notin '.txt','.rtf','.html','.htm','.md','' -or $f.Length -gt 8MB -or $f.Name -notmatch '(?i)license|eula|redist|third.?party|notice|copyright|^MIT\.txt$|^Apache-2\.0\.txt$|^Unicode-3\.0\.txt$')) { Add-Issue 'LEGAL_FILE_TYPE_REQUIRES_REVIEW' $f.FullName; return }
     $copyName=$hash.Substring(0,16)+'-'+$f.Name
     # Preserve source bytes exactly; never newline-normalize originals.
     $dest=if($Copy -eq 'public-legal'){$Legal}else{$Private}
@@ -144,6 +147,31 @@ try {
   foreach($p in $MicrosoftLegalFiles){
     if((Test-InRoot $p $env:VSINSTALLDIR) -or (Test-InRoot $p $env:WindowsSdkDir)){Record-File $p 'microsoft-original-legal-explicit' 'public-legal'}else{Add-Issue 'MICROSOFT_LEGAL_PATH_OUTSIDE_SELECTED_INSTALLATION' $p}
   }
+  # The distributor-approved originals and scope notice are separate from incidental
+  # NuGet/legacy SDK tool licenses discovered above. They travel with the final package.
+  $msRoot = Join-Path $PSScriptRoot 'microsoft-runtime-terms'
+  $msManifestPath = Join-Path $msRoot 'microsoft-runtime-terms.json'
+  $msTerms = Get-Content -LiteralPath $msManifestPath -Raw | ConvertFrom-Json
+  if ($msTerms.schema -ne 1 -or $msTerms.target -cne $Target -or
+      $msTerms.selected_msvc_toolset_version -cne $env:VCToolsVersion -or
+      $msTerms.selected_windows_sdk_version -cne $sdkver -or @($msTerms.files).Count -ne 3) {
+    throw 'MICROSOFT_RUNTIME_TERMS_IDENTITY_MISMATCH'
+  }
+  $expectedMs = @('Visual-Studio-2022-Enterprise-Professional-License-EN.docx', 'sdk_license.rtf', 'WINDOWS-RUNTIME-LICENSE-NOTICE.txt')
+  $seenMs = @{}
+  foreach ($item in $msTerms.files) {
+    if ($item.file -cnotin $expectedMs -or $seenMs.ContainsKey($item.file) -or
+        $item.sha256 -cnotmatch '^[0-9a-f]{64}$') { throw 'MICROSOFT_RUNTIME_TERMS_SCOPE_MISMATCH' }
+    $seenMs[$item.file] = $true
+    $original = Join-Path $msRoot $item.file
+    if (-not (Test-Path -LiteralPath $original -PathType Leaf) -or
+        (Get-Item -LiteralPath $original).Length -ne $item.bytes -or
+        (Get-FileHash -LiteralPath $original -Algorithm SHA256).Hash.ToLowerInvariant() -cne $item.sha256 -or
+        $msTerms.required_package_files.($item.file) -cne $item.sha256) { throw 'MICROSOFT_RUNTIME_TERMS_BYTES_MISMATCH' }
+    $role = if ($item.original_bytes_preserved -eq $true) { 'microsoft-fixed-original-license' } else { 'microsoft-runtime-scope-notice' }
+    Record-File $original $role 'public-legal'
+  }
+  Record-File $msManifestPath 'microsoft-runtime-source-manifest'
   $msLegal=@($Files | Where-Object {$_.role -like 'microsoft-*' -and $_.copy_scope -eq 'public-legal'})
   if($msLegal.Count -eq 0){Add-Issue 'MICROSOFT_ORIGINAL_LEGAL_FILES_NOT_FOUND' 'No original legal text found in selected installation scope'}
   Add-Issue 'MICROSOFT_TERMS_APPLICABILITY_NOT_REVIEWED' 'Candidate documents alone do not establish static-runtime redistribution rights or required downstream terms'

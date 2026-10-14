@@ -102,7 +102,8 @@ def safe_zip(archive):
     infos = archive.infolist()
     require(len(infos) <= 10000, "archive has too many entries")
     for info in infos:
-        name = info.filename
+        name = info.orig_filename
+        require(name == info.filename, "archive filename normalization forbidden")
         parts = PurePosixPath(name).parts
         require(name and not name.startswith("/") and "\\" not in name and ":" not in name
                 and all(p not in (".", "..") for p in parts)
@@ -149,9 +150,9 @@ def review_toolchain(root, inventory_fingerprint, toolchain):
     required_notices = review["required_toolchain_notices"]
     require(type(required_notices) is dict and bool(required_notices), "reviewed downstream toolchain notices are required")
     collected = {row["sha256"] for row in toolchain["toolchain"]["files"] if row["legal_file"] is not None}
-    mandatory_rust = {row["sha256"] for row in toolchain["toolchain"]["files"]
-                      if row["role"] in {"rust-std-original-notices", "rust-std-original-license", "rust-runtime-fixed-commit-license"} and row["legal_file"] is not None}
-    require(bool(mandatory_rust) and mandatory_rust <= set(required_notices.values()), "Rust standard-library original notices must travel with the packages")
+    mandatory_originals = {row["sha256"] for row in toolchain["toolchain"]["files"]
+                      if row["role"] in {"rust-std-original-notices", "rust-std-original-license", "rust-runtime-fixed-commit-license", "microsoft-fixed-original-license", "microsoft-runtime-scope-notice"} and row["legal_file"] is not None}
+    require(bool(mandatory_originals) and mandatory_originals <= set(required_notices.values()), "Collected runtime original notices and scope notice must travel with the packages")
     for name, digest in required_notices.items():
         require(type(name) is str and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,199}", name) is not None
                 and not name.endswith(".") and MARKER.casefold() not in name.casefold()
@@ -310,7 +311,7 @@ def prepare(args):
                 "msi_version": msi_version, "target": TARGET, "ci": {"run_id": args.run_id, "run_attempt": args.attempt, "workflow": WORKFLOW},
                 "packages": packages, "evidence": file_fact(args.output / "RELEASE-EVIDENCE.json"), "signing": "unsigned"}
     write_json(args.output / "release-manifest.json", manifest)
-    sums = "".join(f"{file_fact(path)['sha256']}  {path.name}\n" for path in sorted(args.output.iterdir()))
+    sums = "".join(f"{file_fact(path)['sha256']}  {path.name}\n" for path in sorted(args.output.iterdir(), key=lambda path: path.name))
     (args.output / "SHA256SUMS").write_text(sums, encoding="utf-8", newline="\n")
     validate_bundle(args.output, root, args.source_sha, args.repository, args.run_id, args.attempt)
     print("Validated five-asset release bundle; complete CI success is still required before publication.")

@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "evidence_only": true,
+  "scope": "Original terms and scope notice for the embedded Microsoft release static CRT components of the Windows x64 package. This manifest is not release approval.",
+  "target": "x86_64-pc-windows-msvc",
+  "selected_visual_studio_product": "Microsoft.VisualStudio.Product.Enterprise",
+  "selected_visual_studio_version": "17.14.37710.0",
+  "selected_msvc_toolset_version": "14.44.35207",
+  "selected_windows_sdk_version": "10.0.26100.0",
+  "files": [
+    {
+      "file": "Visual-Studio-2022-Enterprise-Professional-License-EN.docx",
+      "bytes": 63513,
+      "sha256": "9c0cd52b20db9d081854c75bd1b50c75514b8f8cb09c8cad15e89d90b97b5bf3",
+      "original_bytes_preserved": true,
+      "provenance": {
+        "kind": "official_vendor_original",
+        "source_url": "https://visualstudio.microsoft.com/wp-content/uploads/2021/11/Visual-Studio-2022-Enterprise-Professional-License-EN.docx",
+        "license_directory_url": "https://visualstudio.microsoft.com/license-terms/vs2022-ga-proenterprise/",
+        "applicability": "Original Visual Studio 2022 Enterprise/Professional terms; observed selected product is Microsoft.VisualStudio.Product.Enterprise 17.14.37710.0. Relevant distribution provisions are Section 5."
+      }
+    },
+    {
+      "file": "sdk_license.rtf",
+      "bytes": 248573,
+      "sha256": "0f4a26ac9dc50066f8a1bfeaaf3f092d1b9e4791df5487b9f3c31e7c3dc4d7f5",
+      "original_bytes_preserved": true,
+      "provenance": {
+        "kind": "installed_selected_sdk_original",
+        "collection_run": "https://github.com/xue-ding-e/GridCraft-Next/actions/runs/38605163386",
+        "collection_job_id": "115994049328",
+        "collection_artifact_sha256": "b006dd6cc86b726b3fb105fff08ce0126d334668809a5a8165824bf5869ec918",
+        "reference_terms_url": "https://learn.microsoft.com/en-us/legal/windows-sdk/license",
+        "reference_redist_url": "https://learn.microsoft.com/en-us/legal/windows-sdk/redist",
+        "applicability": "Original sdk_license.rtf collected from the selected Windows SDK 10.0.26100.0; EULAID WIN10SDK.RTM.AUG_2018_en-US. Relevant distribution provisions are Section 2(a). The reference web page is not asserted to be byte-identical to this RTF."
+      }
+    },
+    {
+      "file": "WINDOWS-RUNTIME-LICENSE-NOTICE.txt",
+      "bytes": 1299,
+      "sha256": "765de651c4d1eda33c25aa09fd179a50d2f132a01f1201b1ef823a48b2757ed4",
+      "original_bytes_preserved": false,
+      "provenance": {
+        "kind": "project_scope_notice_for_review",
+        "basis": "Scope-only explanatory notice. The two original Microsoft terms remain controlling for their applicable components. No new agreement text or additional licensing restriction is authored."
+      }
+    }
+  ],
+  "required_package_files": {
+    "Visual-Studio-2022-Enterprise-Professional-License-EN.docx": "9c0cd52b20db9d081854c75bd1b50c75514b8f8cb09c8cad15e89d90b97b5bf3",
+    "sdk_license.rtf": "0f4a26ac9dc50066f8a1bfeaaf3f092d1b9e4791df5487b9f3c31e7c3dc4d7f5",
+    "WINDOWS-RUNTIME-LICENSE-NOTICE.txt": "765de651c4d1eda33c25aa09fd179a50d2f132a01f1201b1ef823a48b2757ed4"
+  },
+  "observed_final_link_evidence": {
+    "source_run": "https://github.com/xue-ding-e/GridCraft-Next/actions/runs/38604794873",
+    "summary_sha256": "93707ced0ad3ee46fa591337514cb24bf9a326844be6dae9b921db27cbe7f93c",
+    "executables": [
+      {
+        "name": "gridcraft.exe",
+        "sha256": "de42214ac208d169f054c1ff0168ead10a77d2dc0ba7412878e2d3740074b023",
+        "runtime_libraries": [
+          {
+            "name": "libucrt.lib",
+            "bytes": 43336396,
+            "sha256": "2b247d6a27c22c520c34134b8acf2da3366175a4690886927a51929f37725fdd"
+          },
+          {
+            "name": "libcmt.lib",
+            "bytes": 6534094,
+            "sha256": "8fe40dd342b90b35d62b8f5d55b4e92df7785c122976618365cfe3b014cc857a"
+          },
+          {
+            "name": "libvcruntime.lib",
+            "bytes": 2087406,
+            "sha256": "e4f8daf356d63592ff6d6f7ad90c8c9da4c1230273ad113a9a2b56afd6bfcb04"
+          }
+        ],
+        "unresolved": []
+      },
+      {
+        "name": "gridcraft-cli.exe",
+        "sha256": "ff2e9090703a6660c4dc4ab3161bfd987015f8b1a162f027c939db48901ab621",
+        "runtime_libraries": [
+          {
+            "name": "libucrt.lib",
+            "bytes": 43336396,
+            "sha256": "2b247d6a27c22c520c34134b8acf2da3366175a4690886927a51929f37725fdd"
+          },
+          {
+            "name": "libcmt.lib",
+            "bytes": 6534094,
+            "sha256": "8fe40dd342b90b35d62b8f5d55b4e92df7785c122976618365cfe3b014cc857a"
+          },
+          {
+            "name": "libvcruntime.lib",
+            "bytes": 2087406,
+            "sha256": "e4f8daf356d63592ff6d6f7ad90c8c9da4c1230273ad113a9a2b56afd6bfcb04"
+          }
+        ],
+        "unresolved": []
+      }
+    ]
+  },
+  "integration_requirements": [
+    "Bind this manifest and each listed file hash to the reviewed materials fingerprint.",
+    "Preserve both original Microsoft documents byte-for-byte.",
+    "Use an exact basename-and-SHA-256 exception for this one original DOCX if a text-only legal-file validator is used; do not allow arbitrary DOCX files.",
+    "Include the same scope notice and original terms with both the MSI-installed payload and the portable ZIP, and match their bytes against required_package_files.",
+    "Present the same scoped statement and original-term links with the download; keep the project source and other component licenses unchanged.",
+    "Verify final-release linker evidence and package payloads again; the observed evidence here identifies one validated build and is not approval of a later changed build."
+  ]
+}

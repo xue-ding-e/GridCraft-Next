@@ -80,7 +80,12 @@ def create_fixture(root):
 
 
 def refresh_sums(output):
-    (output / "SHA256SUMS").write_text("".join(f"{bundle.file_fact(path)['sha256']}  {path.name}\n" for path in sorted(output.iterdir()) if path.name != "SHA256SUMS"))
+    # WindowsPath ordering folds case; the format orders exact filename strings.
+    # Use explicit LF bytes too, independent of the fixture writer's host OS.
+    paths = sorted(output.iterdir(), key=lambda path: path.name)
+    (output / "SHA256SUMS").write_text(
+        "".join(f"{bundle.file_fact(path)['sha256']}  {path.name}\n" for path in paths if path.name != "SHA256SUMS"),
+        encoding="utf-8", newline="\n")
 
 
 class BundleTests(unittest.TestCase):
@@ -101,6 +106,13 @@ class BundleTests(unittest.TestCase):
 
     def test_consistent_synthetic_contract_is_accepted(self):
         self.assertEqual(self.validate()["source_sha"], SOURCE)
+
+    def test_checksum_fixture_preserves_canonical_name_order_and_lf(self):
+        data = (self.output / "SHA256SUMS").read_bytes()
+        self.assertNotIn(b"\r", data)
+        names = [line.split("  ", 1)[1] for line in data.decode("utf-8").splitlines()]
+        self.assertEqual(names, sorted(names))
+        self.assertEqual(names[0], "RELEASE-EVIDENCE.json")
 
     def test_missing_real_review_fails_closed(self):
         (self.root / "packaging/windows/windows-release-review.json").unlink()
@@ -236,9 +248,19 @@ class BundleTests(unittest.TestCase):
         for entries in (("../escape",), ("/absolute",), ("a", "A"), ("a\\b",), ("C:/path",), ("INTERNAL-VALIDATION-ONLY.txt",), ("a//b",)):
             with self.subTest(entries=entries), tempfile.TemporaryFile() as stream:
                 with zipfile.ZipFile(stream, "w") as archive:
-                    for name in entries: archive.writestr(name, "test")
+                    for name in entries:
+                        # ZipInfo(name) sanitizes backslashes on Windows. Set
+                        # the raw stored name after construction so the hostile
+                        # fixture, including its central directory, stays hostile.
+                        info = zipfile.ZipInfo("fixture")
+                        info.filename = info.orig_filename = name
+                        archive.writestr(info, "test")
                 stream.seek(0)
-                with zipfile.ZipFile(stream) as archive, self.assertRaises(ValueError): bundle.safe_zip(archive)
+                with zipfile.ZipFile(stream) as archive:
+                    self.assertEqual([info.orig_filename for info in archive.infolist()], list(entries))
+                    # Do not repair the parsed ZipInfo: production must reject
+                    # raw names that Windows would normalize while reading.
+                    with self.assertRaises(ValueError): bundle.safe_zip(archive)
         with tempfile.TemporaryFile() as stream:
             with zipfile.ZipFile(stream, "w") as archive:
                 info = zipfile.ZipInfo("link")
