@@ -1,0 +1,12 @@
+# Modified for GridCraft-Next: independent packaging identity and notices.
+kind = "app"
+categories = ["Office"]
+icon = "assets/app-icon/hicolor/256x256/apps/io.github.xue_ding_e.gridcraft_next.png"
+
+[linux.x86_64]
+asset = "gridcraft-next-{version}-linux-x86_64.tar.gz"
+exec = "gridcraft-next-{version}-linux-x86_64/bin/gridcraft-next"
+
+[linux.aarch64]
+asset = "gridcraft-next-{version}-linux-aarch64.tar.gz"
+exec = "gridcraft-next-{version}-linux-aarch64/bin/gridcraft-next"
