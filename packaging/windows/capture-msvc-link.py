@@ -64,7 +64,10 @@ def expand_args(args, directory, receipts, depth=0):
         (directory / name).write_bytes(data)
         receipts.append({'path': str(path), 'copy': name, 'sha256': hashlib.sha256(data).hexdigest()})
         text = data.decode('utf-16') if data.startswith((b'\xff\xfe', b'\xfe\xff')) else data.decode('utf-8-sig')
-        result.extend(expand_args(windows_tokens(text), directory, receipts, depth + 1))
+        # MS LINK response lines are whitespace-separated; CommandLineToArgvW itself
+        # only splits space/tab. Normalize metadata input, never the forwarded bytes.
+        tokens = windows_tokens(text.replace('\r', ' ').replace('\n', ' '))
+        result.extend(expand_args(tokens, directory, receipts, depth + 1))
     return result
 
 def loaded_runtime_paths(text):
