@@ -581,6 +581,13 @@ fn custom_ok(v: &Value, text: &str, op: &str, crit: &str) -> bool {
     }
 }
 
+/// AutoFilter's blank category includes zero-length text, including a formula's empty-text
+/// result. Whitespace and values merely formatted to look empty are not blank. Keep this
+/// separate from `Value::is_empty`: a stored empty string is still text for other operations.
+fn filter_blank(v: &Value) -> bool {
+    v.is_empty() || matches!(v, Value::Text(text) if text.is_empty())
+}
+
 /// Hides rows of the autofilter range that fail any criterion.
 pub(crate) fn apply_filter(wb: &mut Workbook, sheet: usize) {
     let Some(sh) = wb.sheet(sheet) else { return };
@@ -614,7 +621,7 @@ pub(crate) fn apply_filter(wb: &mut Workbook, sheet: usize) {
             let text = crate::display::cell_text(wb, sh, c);
             let ok = match crit {
                 FilterCriterion::Values { values, blanks } => {
-                    if v.is_empty() {
+                    if filter_blank(&v) {
                         *blanks
                     } else {
                         values.iter().any(|x| x.eq_ignore_ascii_case(&text) || x.eq_ignore_ascii_case(&v.display()))
@@ -701,10 +708,11 @@ pub fn filter_values(wb: &Workbook, sheet: usize, col: u32) -> Vec<(String, bool
     for row in af.range.start.row + 1..=af.range.end.row.min(af.range.start.row + 1_000_000) {
         let c = CellRef::new(row, col);
         let v = sh.value(c);
-        let t = if v.is_empty() { "(Blanks)".to_string() } else { crate::display::cell_text(wb, sh, c) };
+        let blank = filter_blank(&v);
+        let t = if blank { "(Blanks)".to_string() } else { crate::display::cell_text(wb, sh, c) };
         let on = match selected {
             Some(FilterCriterion::Values { values, blanks }) => {
-                if v.is_empty() {
+                if blank {
                     *blanks
                 } else {
                     values.iter().any(|x| x.eq_ignore_ascii_case(&t))
@@ -712,7 +720,10 @@ pub fn filter_values(wb: &Workbook, sheet: usize, col: u32) -> Vec<(String, bool
             }
             _ => true,
         };
-        seen.entry((sort_key(&v), t)).or_insert(on);
+        // Empty cells and empty text share one dropdown entry, not two identically labelled
+        // entries under their different value-type sort keys.
+        let key = if blank { sort_key(&Value::Empty) } else { sort_key(&v) };
+        seen.entry((key, t)).or_insert(on);
     }
     seen.into_iter().map(|((_, t), on)| (t, on)).collect()
 }
