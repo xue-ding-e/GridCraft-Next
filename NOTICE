@@ -35,3 +35,17 @@ material. The Windows packaging gate separately inventories the actual Cargo
 build inputs, including embedded default fonts, and preserves their original
 copyright, license and notice texts in THIRD_PARTY_NOTICES.txt and its named
 license files. Unreviewed internal-validation-only packages are not distributable.
+
+GridCraft-Next additional bundled-code and font attributions
+
+this software is based in part on the work of the Independent JPEG Group
+
+Additional font copyright notices
+
+NotoEmoji-Regular.ttf
+Copyright 2013 Google Inc. All Rights Reserved.
+
+Ubuntu-Light.ttf
+Copyright 2011 Canonical Ltd.  Licensed under the Ubuntu Font Licence 1.0
+
+These copyright statements are transcribed from the exact original font name metadata. See the accompanying original OFL.txt and UFL.txt for the complete license terms. The original font and license files are unmodified.

@@ -190,5 +190,1133 @@
       "source": "git+https://github.com/storytold/craft-libs?rev=d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d#d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d",
       "origin_url": "https://raw.githubusercontent.com/storytold/craft-libs/d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d/LICENSE-APACHE"
     }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#accesskit@0.24.1": [
+    {
+      "path": "verified-windows/AccessKit_accesskit-a55d3e1a18bb-LICENSE-MIT.txt",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/a55d3e1a18bb9ef0e4bccc9083fb13c3e0ad8969/LICENSE-MIT",
+      "original_git_blob_sha": "31aa79387f27e730e33d871925e152e35e428031"
+    },
+    {
+      "path": "verified-windows/AccessKit_accesskit-a55d3e1a18bb-LICENSE-APACHE.txt",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/a55d3e1a18bb9ef0e4bccc9083fb13c3e0ad8969/LICENSE-APACHE",
+      "original_git_blob_sha": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"
+    },
+    {
+      "path": "verified-windows/AccessKit_accesskit-a55d3e1a18bb-AUTHORS.txt",
+      "label": "upstream-root/AUTHORS",
+      "sha256": "3bab8c36f6a85657504aaefb37c7ff34e29b8c917290f3d28a1f0920c992e502",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/a55d3e1a18bb9ef0e4bccc9083fb13c3e0ad8969/AUTHORS",
+      "original_git_blob_sha": "432f1b7bb779a9082fd10a4ef1e4f29c44b512c3"
+    },
+    {
+      "path": "verified-windows/AccessKit_accesskit-a55d3e1a18bb-LICENSE.chromium.txt",
+      "label": "upstream-root/LICENSE.chromium",
+      "sha256": "845022e0c1db1abb41a6ba4cd3c4b674ec290f3359d9d3c78ae558d4c0ed9308",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/a55d3e1a18bb9ef0e4bccc9083fb13c3e0ad8969/LICENSE.chromium",
+      "original_git_blob_sha": "a32e00ce6be3620adca152e53734f7de8fda38cf"
+    },
+    {
+      "path": "verified-windows/accesskit-0.24.1-e38254ff702e4a27-legal.txt",
+      "label": "upstream-legal-block/src/geometry.rs.lines-1-11",
+      "sha256": "e38254ff702e4a278b0198abe2f5cc8b11fa58e488a8a13b7833b3d2a7e8d537",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/a55d3e1a18bb9ef0e4bccc9083fb13c3e0ad8969/common/src/geometry.rs",
+      "original_source_sha256": "2f2c37da6a856f1463c593bd2c01d07f237951556c3f72594cb05a2561afa7ed",
+      "original_git_blob_sha": "a7cd1f2807af44c1e3323561d1752475fd04e55a",
+      "original_byte_range": [
+        0,
+        442
+      ],
+      "original_line_range": [
+        1,
+        11
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit-0.24.1-468e37a93c8dd8e5-legal.txt",
+      "label": "upstream-legal-block/src/lib.rs.lines-1-10",
+      "sha256": "468e37a93c8dd8e5458b325dcc7ccf348bfd176dcc07e79cdcc023e53041c456",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/a55d3e1a18bb9ef0e4bccc9083fb13c3e0ad8969/common/src/lib.rs",
+      "original_source_sha256": "da99bad8c05747eee4c1cee0850488c4e61170f7f55cbf6b39e79cd4e4a1acbf",
+      "original_git_blob_sha": "78fb45aa1191594123c30cd15d62ec54498136fb",
+      "original_byte_range": [
+        0,
+        451
+      ],
+      "original_line_range": [
+        1,
+        10
+      ]
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#accesskit_consumer@0.35.0": [
+    {
+      "path": "verified-windows/AccessKit_accesskit-1bbcf100942b-LICENSE-MIT.txt",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/LICENSE-MIT",
+      "original_git_blob_sha": "31aa79387f27e730e33d871925e152e35e428031"
+    },
+    {
+      "path": "verified-windows/AccessKit_accesskit-1bbcf100942b-LICENSE-APACHE.txt",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/LICENSE-APACHE",
+      "original_git_blob_sha": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"
+    },
+    {
+      "path": "verified-windows/AccessKit_accesskit-1bbcf100942b-AUTHORS.txt",
+      "label": "upstream-root/AUTHORS",
+      "sha256": "3bab8c36f6a85657504aaefb37c7ff34e29b8c917290f3d28a1f0920c992e502",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/AUTHORS",
+      "original_git_blob_sha": "432f1b7bb779a9082fd10a4ef1e4f29c44b512c3"
+    },
+    {
+      "path": "verified-windows/accesskit_consumer-0.35.0-2965f6a5c80d577d-legal.txt",
+      "label": "upstream-legal-block/src/filters.rs.lines-1-5",
+      "sha256": "2965f6a5c80d577d726eee4d2a2ebbb7534d7c0eb5c3cf6c1fdf6f2d187c88d7",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/consumer/src/filters.rs",
+      "original_source_sha256": "e2df7bf15790369fbedd20030c61949292664f4d2881615c8170b42380681c10",
+      "original_git_blob_sha": "8905bef3d6538d9744556ae8c785917a80983126",
+      "original_byte_range": [
+        0,
+        222
+      ],
+      "original_line_range": [
+        1,
+        5
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_consumer-0.35.0-468e37a93c8dd8e5-legal.txt",
+      "label": "upstream-legal-block/src/iterators.rs.lines-1-10",
+      "sha256": "468e37a93c8dd8e5458b325dcc7ccf348bfd176dcc07e79cdcc023e53041c456",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/consumer/src/iterators.rs",
+      "original_source_sha256": "22233da2a6c999c355b74edddbf80fc98c6f32bd52f55de2bacd523f013824a7",
+      "original_git_blob_sha": "f9783f130806435d53ba276192c3bb324236839a",
+      "original_byte_range": [
+        0,
+        451
+      ],
+      "original_line_range": [
+        1,
+        10
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_consumer-0.35.0-14598066ccf2a0f6-legal.txt",
+      "label": "upstream-legal-block/src/lib.rs.lines-1-5",
+      "sha256": "14598066ccf2a0f6e6726b11301ff06b462b459d611de46d02e3f4d6873d600b",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/consumer/src/lib.rs",
+      "original_source_sha256": "f7c619c1c2e4add099d4dece693b36be535262a1f696a188e6040ad6877e34bf",
+      "original_git_blob_sha": "6e277040e29dc15de794002cea293afd4421d986",
+      "original_byte_range": [
+        0,
+        222
+      ],
+      "original_line_range": [
+        1,
+        5
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_consumer-0.35.0-ee076522c88c907a-legal.txt",
+      "label": "upstream-legal-block/src/node.rs.lines-1-10",
+      "sha256": "ee076522c88c907a9822f9e07f193a067b5ec5547dbabe7ec6bb68fc6fd6385a",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/consumer/src/node.rs",
+      "original_source_sha256": "7ca5b53a821529e168af71f63d064ef20308a3634e019c8ce4f1c965c2b483cf",
+      "original_git_blob_sha": "6740565037f41dd3a79a2144b04a5d89877ab4a1",
+      "original_byte_range": [
+        0,
+        451
+      ],
+      "original_line_range": [
+        1,
+        10
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_consumer-0.35.0-96f1f6f5178e37f5-legal.txt",
+      "label": "upstream-legal-block/src/text.rs.lines-1-5",
+      "sha256": "96f1f6f5178e37f50383e0fdb4ceae3c989fe13e991fd7246bda1d6e74cf1dde",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/consumer/src/text.rs",
+      "original_source_sha256": "44d8d2732fda2a60a67bd7c002ff712409b6dfa19318679d448fa9b5fc6b5f18",
+      "original_git_blob_sha": "375cd37c2cd9ef82401e05786e39fcd2c90aff09",
+      "original_byte_range": [
+        0,
+        222
+      ],
+      "original_line_range": [
+        1,
+        5
+      ]
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#accesskit_winit@0.32.2": [
+    {
+      "path": "verified-windows/AccessKit_accesskit-1bbcf100942b-LICENSE-APACHE.txt",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/LICENSE-APACHE",
+      "original_git_blob_sha": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"
+    },
+    {
+      "path": "verified-windows/AccessKit_accesskit-1bbcf100942b-AUTHORS.txt",
+      "label": "upstream-root/AUTHORS",
+      "sha256": "3bab8c36f6a85657504aaefb37c7ff34e29b8c917290f3d28a1f0920c992e502",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/AUTHORS",
+      "original_git_blob_sha": "432f1b7bb779a9082fd10a4ef1e4f29c44b512c3"
+    },
+    {
+      "path": "verified-windows/accesskit_winit-0.32.2-75025a5e33bcd50f-legal.txt",
+      "label": "upstream-legal-block/src/lib.rs.lines-1-4",
+      "sha256": "75025a5e33bcd50f747df3a7fc9a969f2f0cb7b5a098eee6a1e3bf6c481306f0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/platforms/winit/src/lib.rs",
+      "original_source_sha256": "cbe4ef8dde0a3aa3d9777e51f86eeff2eb4396e290ab5ea83494920b8005b631",
+      "original_git_blob_sha": "976fa54bd3adffc4a5f20822fff64db8eb4a9a33",
+      "original_byte_range": [
+        0,
+        152
+      ],
+      "original_line_range": [
+        1,
+        4
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_winit-0.32.2-e02a5933ddb46e68-legal.txt",
+      "label": "upstream-legal-block/src/platform_impl/android.rs.lines-1-4",
+      "sha256": "e02a5933ddb46e68f1d34c2bfddc703fb6b351f676de58a746303273d651f5a5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/platforms/winit/src/platform_impl/android.rs",
+      "original_source_sha256": "3bd0c85c8da3ed2dfaafc107616e9a72216dfae65c0dff2eec63c0ed841afae3",
+      "original_git_blob_sha": "c3d4023718dcadf6d1ba0e1cabd08aaaf640ccde",
+      "original_byte_range": [
+        0,
+        152
+      ],
+      "original_line_range": [
+        1,
+        4
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_winit-0.32.2-8f66c779519de460-legal.txt",
+      "label": "upstream-legal-block/src/platform_impl/macos.rs.lines-1-3",
+      "sha256": "8f66c779519de460932950fc3240883b3d5dace439d9c024f05e7b1d5f9e46fd",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/platforms/winit/src/platform_impl/macos.rs",
+      "original_source_sha256": "9bb36fff123be11afadc7a7f8c09d2b8d04d3f091ad3f6bf23bec55ff933ebf1",
+      "original_git_blob_sha": "50fe6ebd33c14b8ca44c38b9ce2ee180d91106ab",
+      "original_byte_range": [
+        0,
+        151
+      ],
+      "original_line_range": [
+        1,
+        3
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_winit-0.32.2-66e6c75e5b8e1134-legal.txt",
+      "label": "upstream-legal-block/src/platform_impl/mod.rs.lines-1-6",
+      "sha256": "66e6c75e5b8e11341febb9b5a63e55fe0004badf20f49c07a454f1e5a2ed6572",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/platforms/winit/src/platform_impl/mod.rs",
+      "original_source_sha256": "7bd9ce32dbdd50903add37e53af398d876d6d570f8b563aaeb57f2b728031aa7",
+      "original_git_blob_sha": "27f7df0c529735c14ab9fb17a6140d59d6ee5b56",
+      "original_byte_range": [
+        0,
+        207
+      ],
+      "original_line_range": [
+        1,
+        6
+      ]
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#gl_generator@0.14.0": [
+    {
+      "path": "verified-windows/brendanzab_gl-rs-ea503e8d5fb6-LICENSE.txt",
+      "label": "upstream-root/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/brendanzab/gl-rs/ea503e8d5fb6d73c6030e6191ce738cd3bf3433e/LICENSE",
+      "original_git_blob_sha": "d645695673349e3947e8e5ae42332d0ac3164cd7"
+    },
+    {
+      "path": "verified-windows/gl_generator-0.14.0-dcc82da0a685086c-legal.txt",
+      "label": "upstream-legal-block/generators/debug_struct_gen.rs.lines-1-14",
+      "sha256": "dcc82da0a685086cb0754c3f45211aa993732a9e3c158d3147973bc57aa2e45e",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/brendanzab/gl-rs/ea503e8d5fb6d73c6030e6191ce738cd3bf3433e/gl_generator/generators/debug_struct_gen.rs",
+      "original_source_sha256": "6fecccf8e57d4be93ea2657328d6e111ca44bc69542a5522cd7360d80ca64630",
+      "original_git_blob_sha": "98fbcef15886e3cb3dfc7c05a8c796499211a61c",
+      "original_byte_range": [
+        0,
+        622
+      ],
+      "original_line_range": [
+        1,
+        14
+      ]
+    },
+    {
+      "path": "verified-windows/gl_generator-0.14.0-ae6ea15a65b0a1f5-legal.txt",
+      "label": "upstream-legal-block/registry/mod.rs.lines-1-14",
+      "sha256": "ae6ea15a65b0a1f50e42881be36c75b05f0fabecd120a74107ddad72748f2bce",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/brendanzab/gl-rs/ea503e8d5fb6d73c6030e6191ce738cd3bf3433e/gl_generator/registry/mod.rs",
+      "original_source_sha256": "84eed5c113b322e5267b2b130987e6bb726b4e7c38ce50292cd6cc57b8e06994",
+      "original_git_blob_sha": "385b2dfea120dd6f0e9ae1fd9db1fe58ce505ceb",
+      "original_byte_range": [
+        0,
+        627
+      ],
+      "original_line_range": [
+        1,
+        14
+      ]
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#khronos_api@3.1.0": [
+    {
+      "path": "verified-windows/brendanzab_gl-rs-f150967b1c44-LICENSE.txt",
+      "label": "upstream-root/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/brendanzab/gl-rs/f150967b1c44ae888e6676f93f639ebc82771bdc/LICENSE",
+      "original_git_blob_sha": "d645695673349e3947e8e5ae42332d0ac3164cd7"
+    },
+    {
+      "path": "verified-windows/khronos_api-3.1.0-7ef045c445242d05-legal.txt",
+      "label": "upstream-legal-block/api/xml/wgl.xml.lines-3-27",
+      "sha256": "7ef045c445242d054a04c414c512e0a37beb2e53dae44be9c5b78559c95e032c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/85d924a5165e7206f4c73c8c10307658dc2bbe10/xml/wgl.xml",
+      "original_source_sha256": "41e0a2182217b099b1628757956cb103cea9660e830f4d2f9fa07bf3a3679feb",
+      "original_git_blob_sha": "49277ed4649ab2d38d3d8fc3e528532143e9c2fa",
+      "original_byte_range": [
+        54,
+        1134
+      ],
+      "original_line_range": [
+        3,
+        27
+      ]
+    },
+    {
+      "path": "verified-windows/khronos_api-3.1.0-b75d99c543855e28-legal.txt",
+      "label": "upstream-legal-block/build.rs.lines-1-17",
+      "sha256": "b75d99c543855e28c9dcba92c9f0dd65d5e784b50a16b6a9e6111226dbe30543",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/brendanzab/gl-rs/f150967b1c44ae888e6676f93f639ebc82771bdc/khronos_api/build.rs",
+      "original_source_sha256": "88b55daa5f6f0c90e1ab906c08b74834671316bdadc88d7cc25adfa19fc57e62",
+      "original_git_blob_sha": "54fbe012094ebdb5503296f1c82aebc57990ecff",
+      "original_byte_range": [
+        0,
+        823
+      ],
+      "original_line_range": [
+        1,
+        17
+      ]
+    },
+    {
+      "path": "verified-windows/khronos_api-3.1.0-dcc82da0a685086c-legal.txt",
+      "label": "upstream-legal-block/src/lib.rs.lines-1-14",
+      "sha256": "dcc82da0a685086cb0754c3f45211aa993732a9e3c158d3147973bc57aa2e45e",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/brendanzab/gl-rs/f150967b1c44ae888e6676f93f639ebc82771bdc/khronos_api/src/lib.rs",
+      "original_source_sha256": "befbc0e187097e6c9da1ecbd79e0e1af462b6f6466108247745f6aa38abe0673",
+      "original_git_blob_sha": "c0bcbb3d0a811fc8ce6005ce4fa31d664078c361",
+      "original_byte_range": [
+        0,
+        622
+      ],
+      "original_line_range": [
+        1,
+        14
+      ]
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#profiling@1.0.18": [
+    {
+      "path": "verified-windows/aclysma_profiling-8271551172eb-LICENSE-MIT.txt",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "c8167fdeeed46d3f244d3f85c5bf998ce889343691c32be2c61a8bc4b5c08333",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-MIT",
+      "original_git_blob_sha": "6a84e059ad8b43e03c2b06bc2af4dc1d8442808d"
+    },
+    {
+      "path": "verified-windows/aclysma_profiling-8271551172eb-LICENSE-APACHE.txt",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "10d30a673cd5e9349bdc02aeb48f14b3386d27d0da32df8f0a555d4aa16aa551",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/aclysma/profiling/8271551172eb6fa4cba47369aedd93790c623df9/LICENSE-APACHE",
+      "original_git_blob_sha": "139dce95d473c201a8561ef17536314d8b8cda65"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#spirv@0.4.0+sdk-1.4.341.0": [
+    {
+      "path": "verified-windows/gfx-rs_rspirv-8afc3d0ac8e1-LICENSE.txt",
+      "label": "upstream-root/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/gfx-rs/rspirv/8afc3d0ac8e158128cd1410bb2e4b4c26ab11bb4/LICENSE",
+      "original_git_blob_sha": "d645695673349e3947e8e5ae42332d0ac3164cd7"
+    },
+    {
+      "path": "verified-windows/SPIRV-Headers-04f10f650d51-grammar-copyright.txt",
+      "label": "upstream-legal-block/include/spirv/unified1/spirv.core.grammar.json.lines-2-10",
+      "sha256": "60fb093741af079df68c83d31a8c1463cd3fb2ebc368f9ed0031950dcaa0b38b",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/04f10f650d514df88b76d25e83db360142c7b174/include/spirv/unified1/spirv.core.grammar.json",
+      "original_source_sha256": "508e6677e27b0b58eac8395aa49a90ac1766a8d392c247a0aba7b03f4fdd85b9",
+      "original_git_blob_sha": "21451e28898cec892512972af1aaf9f1efa8a174",
+      "original_byte_range": [
+        2,
+        350
+      ],
+      "original_line_range": [
+        2,
+        10
+      ]
+    },
+    {
+      "path": "verified-windows/SPIRV-Headers-04f10f650d51-grammar-LICENSE.txt",
+      "label": "upstream-legal-block/LICENSE.lines-1-26",
+      "sha256": "96edbe52ad48e33f07bf4a492a6a7a265a9ec89f044b8651d6115d4d1ff1a74b",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/04f10f650d514df88b76d25e83db360142c7b174/LICENSE",
+      "original_source_sha256": "ea43b1de38a6f90c488800d66dec1ed671e68cda530266bc96951fb5b6307613",
+      "original_git_blob_sha": "a63e9c620ee123267192113ab0be3814782ba909",
+      "original_byte_range": [
+        0,
+        1361
+      ],
+      "original_line_range": [
+        1,
+        26
+      ]
+    },
+    {
+      "path": "verified-windows/SPIRV-Headers-3208ba5830ea5a8e-grammar-copyright.txt",
+      "label": "upstream-legal-block/include/spirv/unified1/extinst.arm.motion-engine.100.grammar.json.lines-2-5",
+      "sha256": "3208ba5830ea5a8efc9375cf6c3ab52ac3dd911a572dfff9dd9ceb93b453c7f3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/04f10f650d514df88b76d25e83db360142c7b174/include/spirv/unified1/extinst.arm.motion-engine.100.grammar.json",
+      "original_source_sha256": "86fb7c418bc660338068ebe43409371e10cb78ecca83f9347c601b0b68ab8695",
+      "original_git_blob_sha": "abcc16e4f05708c103eb2cd77b7bd85a37ff6230",
+      "original_byte_range": [
+        2,
+        107
+      ],
+      "original_line_range": [
+        2,
+        5
+      ]
+    },
+    {
+      "path": "verified-windows/SPIRV-Headers-0bb8adbd0ded216f-grammar-copyright.txt",
+      "label": "upstream-legal-block/include/spirv/unified1/extinst.debuginfo.grammar.json.lines-2-10",
+      "sha256": "0bb8adbd0ded216f974d64bdb92940c8e77905f6c12d3560a458dd67146b2bb6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/04f10f650d514df88b76d25e83db360142c7b174/include/spirv/unified1/extinst.debuginfo.grammar.json",
+      "original_source_sha256": "3f6b26f7e930ebf27524991c15366a278d7f0a73a8eb70b9e9503375c4a341b6",
+      "original_git_blob_sha": "b73874d6ec89418c0c369ec96664d105d6e2d3f2",
+      "original_byte_range": [
+        2,
+        352
+      ],
+      "original_line_range": [
+        2,
+        10
+      ]
+    },
+    {
+      "path": "verified-windows/SPIRV-Headers-08e69058b05f18f1-grammar-copyright.txt",
+      "label": "upstream-legal-block/include/spirv/unified1/extinst.glsl.std.450.grammar.json.lines-2-10",
+      "sha256": "08e69058b05f18f15738947b38853ae500dba17571eb43d06f7152e0231645e6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/04f10f650d514df88b76d25e83db360142c7b174/include/spirv/unified1/extinst.glsl.std.450.grammar.json",
+      "original_source_sha256": "5d72e48247569f9b77a17a849db624350abc9d26f7f72b153bbcf15c37238239",
+      "original_git_blob_sha": "89338c9d4b26a5d221f5fbb403070ac2e83b496e",
+      "original_byte_range": [
+        2,
+        355
+      ],
+      "original_line_range": [
+        2,
+        10
+      ]
+    },
+    {
+      "path": "verified-windows/SPIRV-Headers-ed2bfaae50cc18ec-grammar-copyright.txt",
+      "label": "upstream-legal-block/include/spirv/unified1/extinst.nonsemantic.shader.debuginfo.100.grammar.json.lines-2-10",
+      "sha256": "ed2bfaae50cc18ec69aeda2a6cdcfee52a68a6ff894f7ba28c0aaedfd5eda34d",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/04f10f650d514df88b76d25e83db360142c7b174/include/spirv/unified1/extinst.nonsemantic.shader.debuginfo.100.grammar.json",
+      "original_source_sha256": "a057349c3902dce992c6f70a685812e84b019a823efbbaf8d81c276e86a12de7",
+      "original_git_blob_sha": "305f171123ba5f33134f787c1a924a376d73b896",
+      "original_byte_range": [
+        2,
+        352
+      ],
+      "original_line_range": [
+        2,
+        10
+      ]
+    },
+    {
+      "path": "verified-windows/SPIRV-Headers-e1e9afab50f60165-grammar-copyright.txt",
+      "label": "upstream-legal-block/include/spirv/unified1/extinst.opencl.std.100.grammar.json.lines-2-10",
+      "sha256": "e1e9afab50f60165ef2bb2ace076daebc930b26e9be48fd9df8edc5ce0dbf61a",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/KhronosGroup/SPIRV-Headers/04f10f650d514df88b76d25e83db360142c7b174/include/spirv/unified1/extinst.opencl.std.100.grammar.json",
+      "original_source_sha256": "44b752999f78f8161ee52a9d305b14576ad7ed0a81a10d28870b7cd0ba5788a4",
+      "original_git_blob_sha": "0b335af28ca4f4cc84ec2a05f6ae0b64c9dca8ef",
+      "original_byte_range": [
+        2,
+        352
+      ],
+      "original_line_range": [
+        2,
+        10
+      ]
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#clipboard-win@5.4.1": [
+    {
+      "path": "verified-windows/DoumanAsh_clipboard-win-3b27cf2bfd1a-LICENSE.txt",
+      "label": "upstream-root/LICENSE",
+      "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/DoumanAsh/clipboard-win/3b27cf2bfd1adcfa6e0264eb51c1025ddaf0f342/LICENSE",
+      "original_git_blob_sha": "36b7cd93cdfbac762f5be4c6ce276df2ea6305c2"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#accesskit_windows@0.32.1": [
+    {
+      "path": "verified-windows/AccessKit_accesskit-1bbcf100942b-LICENSE-MIT.txt",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/LICENSE-MIT",
+      "original_git_blob_sha": "31aa79387f27e730e33d871925e152e35e428031"
+    },
+    {
+      "path": "verified-windows/AccessKit_accesskit-1bbcf100942b-LICENSE-APACHE.txt",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/LICENSE-APACHE",
+      "original_git_blob_sha": "1b5ec8b78e237b5c3b3d812a7c0a6589d0f7161d"
+    },
+    {
+      "path": "verified-windows/AccessKit_accesskit-1bbcf100942b-AUTHORS.txt",
+      "label": "upstream-root/AUTHORS",
+      "sha256": "3bab8c36f6a85657504aaefb37c7ff34e29b8c917290f3d28a1f0920c992e502",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/AUTHORS",
+      "original_git_blob_sha": "432f1b7bb779a9082fd10a4ef1e4f29c44b512c3"
+    },
+    {
+      "path": "verified-windows/AccessKit_accesskit-1bbcf100942b-LICENSE.chromium.txt",
+      "label": "upstream-root/LICENSE.chromium",
+      "sha256": "845022e0c1db1abb41a6ba4cd3c4b674ec290f3359d9d3c78ae558d4c0ed9308",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/LICENSE.chromium",
+      "original_git_blob_sha": "a32e00ce6be3620adca152e53734f7de8fda38cf"
+    },
+    {
+      "path": "verified-windows/accesskit_windows-0.32.1-96f1f6f5178e37f5-legal.txt",
+      "label": "upstream-legal-block/src/adapter.rs.lines-1-5",
+      "sha256": "96f1f6f5178e37f50383e0fdb4ceae3c989fe13e991fd7246bda1d6e74cf1dde",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/platforms/windows/src/adapter.rs",
+      "original_source_sha256": "7135ef9045b907f33e675888940b90f2d967fd6a26b1484d69773f2154247187",
+      "original_git_blob_sha": "7dd2afa3f54c43d6650038bc8ccc4cbfbb5952d2",
+      "original_byte_range": [
+        0,
+        222
+      ],
+      "original_line_range": [
+        1,
+        5
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_windows-0.32.1-2965f6a5c80d577d-legal.txt",
+      "label": "upstream-legal-block/src/context.rs.lines-1-5",
+      "sha256": "2965f6a5c80d577d726eee4d2a2ebbb7534d7c0eb5c3cf6c1fdf6f2d187c88d7",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/platforms/windows/src/context.rs",
+      "original_source_sha256": "8a45005a8c1449e4ed234bb6f041f026f2dbc6d2935e76407637adb1c127601c",
+      "original_git_blob_sha": "7e4158752a3be02e1e567293146016d428cbff86",
+      "original_byte_range": [
+        0,
+        222
+      ],
+      "original_line_range": [
+        1,
+        5
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_windows-0.32.1-14598066ccf2a0f6-legal.txt",
+      "label": "upstream-legal-block/src/lib.rs.lines-1-5",
+      "sha256": "14598066ccf2a0f6e6726b11301ff06b462b459d611de46d02e3f4d6873d600b",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/platforms/windows/src/lib.rs",
+      "original_source_sha256": "8a6f20ed5354c9834d88a59091c764f65aa31359f81c57386fe06e9d806e9396",
+      "original_git_blob_sha": "7aee09b3ef654ca5d8b1450a24f68cd400948bc6",
+      "original_byte_range": [
+        0,
+        222
+      ],
+      "original_line_range": [
+        1,
+        5
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_windows-0.32.1-a03f6ad444d6633b-legal.txt",
+      "label": "upstream-legal-block/src/node.rs.lines-1-10",
+      "sha256": "a03f6ad444d6633b88fc5b82244d805d0ccd1c8511b351e3900f8270fa647fb9",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/platforms/windows/src/node.rs",
+      "original_source_sha256": "e2e558a8f7ce54cd7d5b66e95cd65f42f7ee2533ece0b7796a999348f6640e49",
+      "original_git_blob_sha": "b5dbba0ba1e697cc62a33b19429e1ec2185a577f",
+      "original_byte_range": [
+        0,
+        451
+      ],
+      "original_line_range": [
+        1,
+        10
+      ]
+    },
+    {
+      "path": "verified-windows/accesskit_windows-0.32.1-6ae2fa8a3171d106-legal.txt",
+      "label": "upstream-legal-block/src/window_handle.rs.lines-1-5",
+      "sha256": "6ae2fa8a3171d106e97c71b334536d9cfe7b0e2f87a6c853ae157d61dd6200e3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/AccessKit/accesskit/1bbcf100942bac96c2c3a4a91cb67b0b20201a24/platforms/windows/src/window_handle.rs",
+      "original_source_sha256": "dec1d78c81784a18c50f066e89d57d0fe02a7c9199a11e47a0833f8b9113d8c2",
+      "original_git_blob_sha": "0538d5bfc2d9a9a9e33c1880cb0feb45209e64c8",
+      "original_byte_range": [
+        0,
+        222
+      ],
+      "original_line_range": [
+        1,
+        5
+      ]
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#cursor-icon@1.2.0": [
+    {
+      "path": "verified-windows/cursor-icon-1.2.0-w3c-license-and-attribution-0f68576945d712ad.txt",
+      "label": "upstream-legal-block/src/lib.rs.lines-34-102",
+      "sha256": "0f68576945d712ad02b13c27376560906420f890e1044994b31bf10c0618d147",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-windowing/cursor-icon/766287581de8b4895d018c2d15ada77627a954f0/src/lib.rs",
+      "original_source_sha256": "2f649887b91d2ea059fcf64ef8512a16c0bde72e38ff0aeb14df0f119a9885cb",
+      "original_git_blob_sha": "c079dcba9d4245eb0bf6279cf0546f9fe9374ad1",
+      "original_byte_range": [
+        994,
+        4340
+      ],
+      "original_line_range": [
+        34,
+        102
+      ],
+      "applicability": "Applies explicitly to cursor or keyboard enums used by the cross-platform window stack, including Windows. Include conservatively; exact object-level reachability is not claimed.",
+      "crate_archive_sha256": "f27ae1dd37df86211c42e150270f82743308803d90a6f6e6651cd730d5e1732f"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#winit@0.30.13": [
+    {
+      "path": "verified-windows/winit-0.30.13-w3c-license-and-attribution-3a02f6e77588db52.txt",
+      "label": "upstream-legal-block/src/keyboard.rs.lines-3-70",
+      "sha256": "3a02f6e77588db5236fbdd83a1218fef04c7787f102093c4e62c7f7b4f9ccca0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-windowing/winit/e9809ef54b18499bb4f2cac945719ecc2a61061b/src/keyboard.rs",
+      "original_source_sha256": "fb1400750fb0c6d376415e642c837e0e8ded95f55ba03a8889d336d180620394",
+      "original_git_blob_sha": "7b406f0890e07e52f122922aae14d8587959efe5",
+      "original_byte_range": [
+        36,
+        3655
+      ],
+      "original_line_range": [
+        3,
+        70
+      ],
+      "applicability": "Applies explicitly to cursor or keyboard enums used by the cross-platform window stack, including Windows. Include conservatively; exact object-level reachability is not claimed.",
+      "crate_archive_sha256": "a6755fa58a9f8350bd1e472d4c3fcc25f824ec358933bba33306d0b63df5978d"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#image@0.25.10": [
+    {
+      "path": "verified-windows/image-0.25.10-ijg-license-and-acknowledgment-bef8f808cf858384.txt",
+      "label": "upstream-legal-block/src/codecs/jpeg/transform.rs.lines-1-52",
+      "sha256": "bef8f808cf8583849854000167ff203e47e2e6373478881a48cd7f54fbc9fc7e",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/image-rs/image/76e57184f22772dad1138e96954e57945406b15e/src/codecs/jpeg/transform.rs",
+      "original_source_sha256": "65490ae7ce990dda33044b4c52afc1bdcfa836b474a1b6a06c611af6e53a70db",
+      "original_git_blob_sha": "1ca01a9b523c0e0414607c4130e686f035078c43",
+      "original_byte_range": [
+        0,
+        2563
+      ],
+      "original_line_range": [
+        1,
+        52
+      ],
+      "applicability": "Candidate Cargo.toml explicitly enables image/jpeg. FDCT encoder dead-code elimination is not established. Include exact block plus human-readable executable acknowledgement conservatively.",
+      "crate_archive_sha256": "85ab80394333c02fe689eaf900ab500fbd0c2213da414687ebf995a65d5a6104"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#libm@0.2.16": [
+    {
+      "path": "verified-windows/libm-0.2.16-exp2f-original-notice-d9d31636bf6dc09d.txt",
+      "label": "upstream-legal-block/src/math/exp2f.rs.lines-1-25",
+      "sha256": "d9d31636bf6dc09dbbe83abe0514e8d867f635bf3ef99b5163b54c56e6524077",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/exp2f.rs",
+      "original_source_sha256": "3b4b5cb2e5674e1ce66a6051710738c1a6edc1d1638686fe9c78f0af4792a634",
+      "original_git_blob_sha": "ceff6822c59695428266f00f2d82713c73ee4446",
+      "original_byte_range": [
+        0,
+        1420
+      ],
+      "original_line_range": [
+        1,
+        25
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-rem_pio2-original-notice-da28bd93659d512c.txt",
+      "label": "upstream-legal-block/src/math/rem_pio2.rs.lines-1-12",
+      "sha256": "da28bd93659d512cba362af000b10121e71e63ef135f3ba398a05f376e90bc7e",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/rem_pio2.rs",
+      "original_source_sha256": "5a040ab09dc356bca6d57712327151ed43003e2bac156553e3eb87d1cdefd2d1",
+      "original_git_blob_sha": "61b1030275a228f8f221e231660f5b0992c7b60a",
+      "original_byte_range": [
+        0,
+        468
+      ],
+      "original_line_range": [
+        1,
+        12
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-powf-original-notice-0c3d0381d2cd647b.txt",
+      "label": "upstream-legal-block/src/math/powf.rs.lines-5-14",
+      "sha256": "0c3d0381d2cd647be68590170490be5f624c962d9f95eb698489e578c1de8f05",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/powf.rs",
+      "original_source_sha256": "819971cb8e927d80113aded3cfe90dcd501c031e0eb1c562b58842fddd1751be",
+      "original_git_blob_sha": "17772ae872d3373ab1aa2fb60c8fd1ee519b4f8f",
+      "original_byte_range": [
+        136,
+        515
+      ],
+      "original_line_range": [
+        5,
+        14
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-k_tan-original-notice-ae36b8732e1a0fd7.txt",
+      "label": "upstream-legal-block/src/math/k_tan.rs.lines-1-9",
+      "sha256": "ae36b8732e1a0fd7cf1b44f0840d2fca6e15432a92e6c1a1d7ef4bd5b5d83bc6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/k_tan.rs",
+      "original_source_sha256": "dc3f8ece9187bbd65792a7d1068e676092e9c2a0886f28c80579f9bd94d744b7",
+      "original_git_blob_sha": "ac48d661fd620cec021245e5f35fb288ac039532",
+      "original_byte_range": [
+        0,
+        363
+      ],
+      "original_line_range": [
+        1,
+        9
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-k_cos-original-notice-cd052f4fc22d6625.txt",
+      "label": "upstream-legal-block/src/math/k_cos.rs.lines-1-10",
+      "sha256": "cd052f4fc22d6625c9f4439c66d4512a9011446d3f2dff15842925b024821cbb",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/k_cos.rs",
+      "original_source_sha256": "d4867527877c846aa8e2a0b43cf06f03e2d94c321a548acaf8d5171c09ff4057",
+      "original_git_blob_sha": "1a2ebabe334372becd20b0a531398dc5269d036c",
+      "original_byte_range": [
+        0,
+        426
+      ],
+      "original_line_range": [
+        1,
+        10
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-cbrt-original-notice-225167f203ade8fe.txt",
+      "label": "upstream-legal-block/src/math/cbrt.rs.lines-2-5",
+      "sha256": "225167f203ade8fe5b0714aed4abf358d23fb9dd385a63580ba216ac88a7b799",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/cbrt.rs",
+      "original_source_sha256": "1ed98a0943c46ca48e32af54b6baeb80b6e8da5dda550005711fcb26bfcf12c2",
+      "original_git_blob_sha": "e905e15f13fbeedc259d1d90c99980cc009c4ca9",
+      "original_byte_range": [
+        35,
+        172
+      ],
+      "original_line_range": [
+        2,
+        5
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-cos-original-notice-78faf2571fe417f3.txt",
+      "label": "upstream-legal-block/src/math/cos.rs.lines-1-10",
+      "sha256": "78faf2571fe417f3bcd7b38798c4d9ddf499ca43d1ede6fa44992ba75445bff7",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/cos.rs",
+      "original_source_sha256": "6e81752899c471bd42d04bdf08e0b22bc10a29f92fa2a343281b995fd342f035",
+      "original_git_blob_sha": "b2f786323f4d79b8259c49f7d1b5c8512b7e9983",
+      "original_byte_range": [
+        0,
+        428
+      ],
+      "original_line_range": [
+        1,
+        10
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-sin-original-notice-0beade56a930d1c1.txt",
+      "label": "upstream-legal-block/src/math/sin.rs.lines-1-10",
+      "sha256": "0beade56a930d1c1a35daa8cd5bbe8350757c3b38ac025a553f7db8bdfaf9e16",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/sin.rs",
+      "original_source_sha256": "b48cebd120fc2ac93a6563059cabda28a72c8680304eb8335b92b412235cc232",
+      "original_git_blob_sha": "5378a7bc3874a411e23aa042e23bd76148084852",
+      "original_byte_range": [
+        0,
+        428
+      ],
+      "original_line_range": [
+        1,
+        10
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-atan2-original-notice-11f476f899dacfef.txt",
+      "label": "upstream-legal-block/src/math/atan2.rs.lines-2-12",
+      "sha256": "11f476f899dacfef801a097465ad0755ad4546afe03b02c9a17aa38e228344e1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/atan2.rs",
+      "original_source_sha256": "7d028d4d397f7484b8feed7b228eda65b84acac94d27729d236d5df95e38d8f0",
+      "original_git_blob_sha": "51456e409b8cc889d4428029e73edf4f77094b9d",
+      "original_byte_range": [
+        54,
+        437
+      ],
+      "original_line_range": [
+        2,
+        12
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-j1-original-notice-74344ebf347f27ca.txt",
+      "label": "upstream-legal-block/src/math/j1.rs.lines-2-11",
+      "sha256": "74344ebf347f27ca446e00f1c1921f705546f4b20e0fb31c183cd2c8464b1bc5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/j1.rs",
+      "original_source_sha256": "e0a10746fd11a458d55ee61e758d9f016ff0f2203a07eb9907b5aca709a40469",
+      "original_git_blob_sha": "7d304ba10b7b34923ac27816d2ddb702e04f2095",
+      "original_byte_range": [
+        51,
+        431
+      ],
+      "original_line_range": [
+        2,
+        11
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-exp2-original-notice-2728151294eb9319.txt",
+      "label": "upstream-legal-block/src/math/exp2.rs.lines-1-25",
+      "sha256": "2728151294eb93196ab6dd7cb28ddc6e9ab76bf7ebf8c2e1a15f0d2221c98c76",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/exp2.rs",
+      "original_source_sha256": "e7270f15a682b69a49e042c80503c206d37c6c895f2c63da59a5e2431fa5fedc",
+      "original_git_blob_sha": "08b71587f6de5d04be8c001431e69ff85688bc0e",
+      "original_byte_range": [
+        0,
+        1422
+      ],
+      "original_line_range": [
+        1,
+        25
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-pow-original-notice-15e78071c8347a68.txt",
+      "label": "upstream-legal-block/src/math/pow.rs.lines-2-10",
+      "sha256": "15e78071c8347a689c48ec92bbdd5eba7bd8dc74f86ee3e7ad31d34b24fefe83",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/pow.rs",
+      "original_source_sha256": "c5566d0f48682d107e8803b0ed204ff3521503348f18a4f26cbe3f47fef15192",
+      "original_git_blob_sha": "914d68cfce1a2b625893b37cedf8f013bfabb7c0",
+      "original_byte_range": [
+        52,
+        372
+      ],
+      "original_line_range": [
+        2,
+        10
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-k_tanf-original-notice-5a534ed1f9266ed7.txt",
+      "label": "upstream-legal-block/src/math/k_tanf.rs.lines-2-10",
+      "sha256": "5a534ed1f9266ed799e9f2e3f830f15411762021829da121b23df5edc498c6b6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/k_tanf.rs",
+      "original_source_sha256": "3381d2d4865bfc98e87aadb96bd8986f7691a389569a58fb1cb8db74fb5d9c20",
+      "original_git_blob_sha": "79382f57bf68f724f94b3ad8e461956c99348144",
+      "original_byte_range": [
+        52,
+        366
+      ],
+      "original_line_range": [
+        2,
+        10
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-tan-original-notice-59ee71a59035c18a.txt",
+      "label": "upstream-legal-block/src/math/tan.rs.lines-1-10",
+      "sha256": "59ee71a59035c18a5043881ef760e797cc17dc0cfd65eb43075f72a0ecf8292a",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/tan.rs",
+      "original_source_sha256": "2ea87ca18526753db6d149635ed6c895c8fbafd1e0fa7a9c04f7dc44b4eae986",
+      "original_git_blob_sha": "79c1bad563e2f2fc5c630083f9600b6ebdc4d83f",
+      "original_byte_range": [
+        0,
+        428
+      ],
+      "original_line_range": [
+        1,
+        10
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    },
+    {
+      "path": "verified-windows/libm-0.2.16-k_sin-original-notice-e00a06f546cd736a.txt",
+      "label": "upstream-legal-block/src/math/k_sin.rs.lines-1-10",
+      "sha256": "e00a06f546cd736ac64d82d5c88c23810aec69eec0f61cc64705ea57693e6049",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/rust-lang/compiler-builtins/dfd2203a4d6110820ad7bb65cafe1bf331a03a3d/libm/src/math/k_sin.rs",
+      "original_source_sha256": "dfe6524cb2d530ec51eb1a2ab233aeb65b3f12177c1fb2f50f044ea41170f5d8",
+      "original_git_blob_sha": "2f8542945136ed6a73adf03a361c7e4853e53a4a",
+      "original_byte_range": [
+        0,
+        426
+      ],
+      "original_line_range": [
+        1,
+        10
+      ],
+      "applicability": "Observed library build input. Specific functions linked into the Windows executable are unproven. Original libm LICENSE.txt does not reproduce these complete per-file grants/BSD conditions or all copyright holders. Conservative inclusion is recommended.",
+      "crate_archive_sha256": "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#linebender_resource_handle@0.1.1": [
+    {
+      "path": "verified-windows/linebender_resource_handle-0.1.1-lib-copyright-e77e6a7cb4ab9546.txt",
+      "label": "upstream-legal-block/src/lib.rs.lines-1-2",
+      "sha256": "e77e6a7cb4ab954606a3ca05c6fc615ffedca22d380fbb51a7935100347a642f",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/linebender/raw_resource_handle/bd8694ffca7550e8d569346c50de5fdcb5c51a7f/src/lib.rs",
+      "original_source_sha256": "ba557d6e29bd215d0f14f639f03937767eca1bb821abf3d114ed69f339414001",
+      "original_git_blob_sha": "be46cb3f931ed74d4a923b168b267224500f52c4",
+      "original_byte_range": [
+        0,
+        96
+      ],
+      "original_line_range": [
+        1,
+        2
+      ],
+      "applicability": "LICENSE-MIT has no copyright header; source uses 2022/2024 Raw Resource Handle Authors. Apache-2.0 OR MIT allows Apache option; AUTHORS is provenance, not automatically a separately mandated binary notice. Include conservatively or document chosen Apache path.",
+      "crate_archive_sha256": "d4a5ff6bcca6c4867b1c4fd4ef63e4db7436ef363e0ad7531d1558856bae64f4"
+    },
+    {
+      "path": "verified-windows/linebender_resource_handle-0.1.1-font-copyright-33123ed5db5707e7.txt",
+      "label": "upstream-legal-block/src/font.rs.lines-1-2",
+      "sha256": "33123ed5db5707e7803e1dd4a374d5485461f6c1356e4f81d85a9ed27f459544",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/linebender/raw_resource_handle/bd8694ffca7550e8d569346c50de5fdcb5c51a7f/src/font.rs",
+      "original_source_sha256": "8cc131912d270aab2a4972857254904990a7facc8c3b747cbec37151da064098",
+      "original_git_blob_sha": "11978f7b7a390d0245660a2206541aa017aaf028",
+      "original_byte_range": [
+        0,
+        96
+      ],
+      "original_line_range": [
+        1,
+        2
+      ],
+      "applicability": "LICENSE-MIT has no copyright header; source uses 2022/2024 Raw Resource Handle Authors. Apache-2.0 OR MIT allows Apache option; AUTHORS is provenance, not automatically a separately mandated binary notice. Include conservatively or document chosen Apache path.",
+      "crate_archive_sha256": "d4a5ff6bcca6c4867b1c4fd4ef63e4db7436ef363e0ad7531d1558856bae64f4"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#harfrust@0.12.0": [
+    {
+      "path": "verified-windows/unicode-pinned-LICENSE.txt",
+      "label": "Unicode V3 full terms from pinned official upstream data repository",
+      "sha256": "fe5c62b543e287981db198f2acfa0ca732d12591a1024536dc8fd85dacd77104",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/unicode-org/unicodetools/ecd26be2e82be37609090942c14e518e57e905d8/LICENSE",
+      "original_source_sha256": "fe5c62b543e287981db198f2acfa0ca732d12591a1024536dc8fd85dacd77104",
+      "original_git_blob_sha": "d7e7973c2fd6f2586a8999a69dc21e39af26be0f",
+      "original_byte_range": [
+        0,
+        2033
+      ],
+      "original_line_range": [
+        1,
+        41
+      ],
+      "applicability": "Full upstream data-license text. Keep its original 2001–2024 copyright; accompany with original data-specific 2025 header. This is not Harfrust crate LICENSE."
+    },
+    {
+      "path": "verified-windows/harfbuzz13-COPYING.txt",
+      "label": "Microsoft USE data MIT terms",
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/a0fc099681a69ae40665fbea74982a2e9d7a5260/src/ms-use/COPYING",
+      "original_source_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "original_git_blob_sha": "9e841e7a26e4eb057b24511e7b92d42b257a80e5",
+      "original_byte_range": [
+        0,
+        1141
+      ],
+      "original_line_range": [
+        1,
+        21
+      ],
+      "applicability": "Exact complete license for derived Microsoft USE data; identical full bytes already appear in Windows package notices, but add explicit Harfrust association."
+    },
+    {
+      "path": "verified-windows/harfrust-unicode_emoji_table-original-header.txt",
+      "label": "upstream-legal-block/src/hb/unicode_emoji_table.rs.lines-1-19",
+      "sha256": "0f42911773123528a0de8dde92d7e55dcdad0d7c65b3d6f0859a986fbb4009d2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/harfbuzz/harfrust/60b28ea22b5261710018d69c168a762bcb28794c/harfrust/src/hb/unicode_emoji_table.rs",
+      "original_source_sha256": "e4fd4ad582d8df3d14d0c7ed34f33ad615865438a8178879954ddfc993d5faea",
+      "original_git_blob_sha": "4e194bb107c4694d3cbf3b460ce3a23bbaa2da0d",
+      "original_byte_range": [
+        0,
+        587
+      ],
+      "original_line_range": [
+        1,
+        19
+      ],
+      "applicability": "Exact original published crate runtime-derived-data attribution/provenance header; not replacement terms."
+    },
+    {
+      "path": "verified-windows/harfrust-ucd_table-original-header.txt",
+      "label": "upstream-legal-block/src/hb/ucd_table.rs.lines-1-8",
+      "sha256": "2490ec6e93e6d8378a0715798318c9007fbf880877853a4f2a2042525b20a1bc",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/harfbuzz/harfrust/60b28ea22b5261710018d69c168a762bcb28794c/harfrust/src/hb/ucd_table.rs",
+      "original_source_sha256": "74e13963d5565e0683a2447e0075100015fdd452af31e458544fb362c9db6abb",
+      "original_git_blob_sha": "980b32a2a6253f6afbb879f22ceff46e8a203e70",
+      "original_byte_range": [
+        0,
+        219
+      ],
+      "original_line_range": [
+        1,
+        8
+      ],
+      "applicability": "Exact original published crate runtime-derived-data attribution/provenance header; not replacement terms."
+    },
+    {
+      "path": "verified-windows/harfrust-ot_shaper_use_table-original-header.txt",
+      "label": "upstream-legal-block/src/hb/ot_shaper_use_table.rs.lines-1-44",
+      "sha256": "8b981a8994c548b0461efc8b8d911b5954cdd1094c912fc57e56385422519169",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/harfbuzz/harfrust/60b28ea22b5261710018d69c168a762bcb28794c/harfrust/src/hb/ot_shaper_use_table.rs",
+      "original_source_sha256": "c59bc5eb00c191302d9f753a1a6b2d648ef3afc659b1b54903f45cc78c122075",
+      "original_git_blob_sha": "de08a5b43a2ef697fa8cc57da160b7e1dfa024da",
+      "original_byte_range": [
+        0,
+        1980
+      ],
+      "original_line_range": [
+        1,
+        44
+      ],
+      "applicability": "Exact original published crate runtime-derived-data attribution/provenance header; not replacement terms."
+    }
   ]
 }
