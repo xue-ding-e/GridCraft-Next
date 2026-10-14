@@ -47,8 +47,21 @@ try{
   $actual=(Get-FileHash -LiteralPath $exe -Algorithm SHA256).Hash.ToLowerInvariant()
   if($record.exit_code -ne $successCode -or $record.arguments.Count -ne 1 -or $record.arguments[0] -ne "@$rsp"){throw 'MSVC_PROBE_ARGUMENT_OR_EXIT_DRIFT'}
   if($record.response_files.Count -ne 1 -or $record.response_files[0].sha256 -ne (Get-FileHash -LiteralPath $rsp -Algorithm SHA256).Hash.ToLowerInvariant()){throw 'MSVC_PROBE_RESPONSE_BYTES_DRIFT'}
-  if($record.output_path -ne $exe -or $record.output_sha256 -ne $actual -or $actual -ne $baseline){throw 'MSVC_PROBE_FINAL_BINARY_DRIFT'}
-  if($record.unresolved.Count -gt 0){throw 'MSVC_PROBE_RUNTIME_PARSE_UNRESOLVED'}
+  if($record.output_path -ne $exe){throw 'MSVC_PROBE_OUTPUT_PATH_DRIFT'}
+  if($record.output_sha256 -ne $actual){throw 'MSVC_PROBE_RECEIPT_HASH_DRIFT'}
+  if($actual -ne $baseline){throw 'MSVC_PROBE_BASELINE_HASH_DRIFT'}
+  if($record.unresolved.Count -gt 0){
+    $codes = @($record.unresolved | Where-Object { $_ -cmatch '^[A-Z][A-Z0-9_]+$' })
+    $logBytes = [IO.File]::ReadAllBytes($record.link_log)
+    $logText = [Text.Encoding]::UTF8.GetString($logBytes)
+    # Bounded shapes only: no raw linker lines, paths, arguments or environment values.
+    [ordered]@{codes=$codes;log_bytes=$logBytes.Length;nul_bytes=@($logBytes | Where-Object {$_ -eq 0}).Count;
+      searching_lines=[regex]::Matches($logText,'(?m)^\s*Searching ').Count;
+      loaded_lines=[regex]::Matches($logText,'(?m)^\s*Loaded ').Count;
+      runtime_mentions=[regex]::Matches($logText,'(?i)libcmt\.lib|libucrt\.lib|libvcruntime\.lib').Count} |
+      ConvertTo-Json -Compress | Write-Output
+    throw 'MSVC_PROBE_RUNTIME_PARSE_UNRESOLVED'
+  }
   $names=@($record.runtime_libraries | ForEach-Object {$_.name.ToLowerInvariant()})
   if('libcmt.lib' -notin $names -or 'libucrt.lib' -notin $names){throw 'MSVC_PROBE_STATIC_CRT_NOT_PROVEN'}
   foreach($lib in $record.runtime_libraries){if((Get-FileHash -LiteralPath $lib.path -Algorithm SHA256).Hash.ToLowerInvariant() -ne $lib.sha256){throw 'MSVC_PROBE_RUNTIME_HASH_DRIFT'}}

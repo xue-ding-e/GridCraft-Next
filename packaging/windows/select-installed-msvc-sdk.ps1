@@ -60,29 +60,46 @@ try {
   if ($WindowsSdkVersion) { $sdkVersions = @($sdkVersions | Where-Object Name -eq $WindowsSdkVersion) }
   $sdk = $sdkVersions | Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
   if (-not $sdk) { throw 'REQUESTED_WINDOWS_SDK_X64_NOT_INSTALLED' }
-  $vcvars = Join-Path $vsPath 'VC\Auxiliary\Build\vcvarsall.bat'
-  if (-not (Test-Path -LiteralPath $vcvars -PathType Leaf)) { throw 'VCVARSALL_NOT_INSTALLED' }
-  # Reject cmd metacharacters rather than interpolating an unexpected install path.
-  if ($vcvars -match '["%&!^<>\r\n]') { throw 'UNEXPECTED_INSTALLATION_PATH_CHARACTERS' }
-  $allowed = @('PATH','LIB','LIBPATH','INCLUDE','VSINSTALLDIR','VCINSTALLDIR','VisualStudioVersion','VCToolsInstallDir','VCToolsVersion','VCToolsRedistDir','WindowsSdkDir','WindowsSDKVersion','WindowsLibPath','UniversalCRTSdkDir','UCRTVersion','VSCMD_ARG_HOST_ARCH','VSCMD_ARG_TGT_ARCH')
-  $envFile = Join-Path $private 'developer-env.cmd'
-  $cmdLines = @('@echo off', ('call "{0}" amd64 {1} -vcvars_ver={2} >nul 2>"{3}"' -f $vcvars,$sdk.Name,$vc.Name,(Join-Path $private 'vcvars-errors.txt')), 'if errorlevel 1 exit /b %errorlevel%', 'setlocal EnableDelayedExpansion')
-  # Delayed expansion occurs after parsing, so PATH/LIB values cannot become cmd operators.
-  # Only named values are emitted; no full environment dump.
-  foreach ($name in $allowed) { $cmdLines += ('echo {0}=!{0}!' -f $name) }
-  $cmdLines += 'exit /b 0'
-  [IO.File]::WriteAllLines($envFile, $cmdLines, [Text.Encoding]::Default)
-  $lines = @(& $env:ComSpec /d /c $envFile 2>> (Join-Path $private 'vcvars-errors.txt'))
-  if ($LASTEXITCODE -ne 0) { throw 'VCVARS_SELECTION_FAILED' }
-  $selected = [ordered]@{}
-  foreach ($line in $lines) {
-    if ($line -match '^([^=]+)=(.*)$' -and $Matches[1] -in $allowed) { $selected[$Matches[1]] = $Matches[2] }
+  # This x64 package needs a narrowly selected release compiler/SDK, not a general
+  # developer shell. Bind only verified installation directories in this process.
+  # This avoids relying on a batch file to export state across shell boundaries.
+  # The cheap real /MT C + link probe verifies these actual include/library inputs.
+  $vcBin = Join-Path $vc.FullName 'bin\Hostx64\x64'
+  $sdkBin = Join-Path $kitsRoot "bin\$($sdk.Name)\x64"
+  $libDirs = @(
+    (Join-Path $vc.FullName 'lib\x64'),
+    (Join-Path $kitsRoot "Lib\$($sdk.Name)\ucrt\x64"),
+    (Join-Path $kitsRoot "Lib\$($sdk.Name)\um\x64")
+  )
+  $includeDirs = @(
+    (Join-Path $vc.FullName 'include'),
+    (Join-Path $kitsRoot "Include\$($sdk.Name)\ucrt"),
+    (Join-Path $kitsRoot "Include\$($sdk.Name)\shared"),
+    (Join-Path $kitsRoot "Include\$($sdk.Name)\um")
+  )
+  foreach ($directory in @($vcBin, $sdkBin) + $libDirs + $includeDirs) {
+    if (-not (Test-Path -LiteralPath $directory -PathType Container)) { throw 'SELECTED_X64_BUILD_DIRECTORY_MISSING' }
   }
-  foreach ($name in 'PATH','LIB','INCLUDE','VCToolsInstallDir','VCToolsVersion','WindowsSdkDir','WindowsSDKVersion') {
-    if (-not $selected[$name]) { throw 'VCVARS_REQUIRED_VALUE_MISSING' }
+  foreach ($header in @((Join-Path $includeDirs[0] 'vcruntime.h'), (Join-Path $includeDirs[1] 'stdio.h'), (Join-Path $includeDirs[3] 'Windows.h'))) {
+    if (-not (Test-Path -LiteralPath $header -PathType Leaf)) { throw 'SELECTED_X64_BUILD_HEADER_MISSING' }
   }
-  if ($selected['VCToolsVersion'].TrimEnd('\') -ne $vc.Name -or $selected['WindowsSDKVersion'].TrimEnd('\') -ne $sdk.Name) { throw 'VCVARS_SELECTED_VERSION_MISMATCH' }
-  if ([IO.Path]::GetFullPath($selected['VCToolsInstallDir']).TrimEnd('\') -ne $vc.FullName.TrimEnd('\')) { throw 'VCVARS_SELECTED_VC_PATH_MISMATCH' }
+  $selected = [ordered]@{
+    PATH = (@($vcBin, $sdkBin, $env:PATH) -join ';')
+    LIB = ($libDirs -join ';')
+    INCLUDE = ($includeDirs -join ';')
+    VSINSTALLDIR = ($vsPath.TrimEnd('\') + '\')
+    VCINSTALLDIR = ((Join-Path $vsPath 'VC').TrimEnd('\') + '\')
+    VisualStudioVersion = '17.0'
+    VCToolsInstallDir = ($vc.FullName.TrimEnd('\') + '\')
+    VCToolsVersion = $vc.Name
+    WindowsSdkDir = ($kitsRoot.TrimEnd('\') + '\')
+    WindowsSDKVersion = ($sdk.Name + '\')
+    UniversalCRTSdkDir = ($kitsRoot.TrimEnd('\') + '\')
+    UCRTVersion = $sdk.Name
+    VSCMD_ARG_HOST_ARCH = 'x64'
+    VSCMD_ARG_TGT_ARCH = 'x64'
+  }
+  $allowed = @($selected.Keys)
   $linker = Join-Path $vc.FullName 'bin\Hostx64\x64\link.exe'
   if ($ApplyToProcess) {
     foreach ($name in $allowed) { if ($selected.Contains($name)) { [Environment]::SetEnvironmentVariable($name, $selected[$name], 'Process') } }
