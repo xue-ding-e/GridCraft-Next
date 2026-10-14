@@ -30,13 +30,26 @@ jobs:
         run: |
           ./packaging/windows/select-installed-msvc-sdk.ps1 -OutputDirectory "$env:RUNNER_TEMP/selection" -ApplyToProcess
           ./packaging/windows/test-msvc-link-capture.ps1 -OutputDirectory "$env:RUNNER_TEMP/probe"
+      - name: Inspect pinned installed toolchain originals without a Rust build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          # A real Windows regex regression, independent of external compilation.
+          $crlf = "release: 1.99.0`r`nLLVM version: 23.1.0`r`n"
+          if ($crlf -match '(?m)^release: 1\.99\.0$') { throw 'CRLF regression fixture did not reproduce the old parser failure' }
+          if ($crlf -notmatch '(?m)^release: 1\.99\.0\r?$') { throw 'CRLF identity fix failed' }
+          rustup toolchain install 1.99.0 --profile minimal --target x86_64-pc-windows-msvc
+          if ($LASTEXITCODE -ne 0) { throw 'Pinned official toolchain installation failed' }
+          ./packaging/windows/select-installed-msvc-sdk.ps1 -OutputDirectory "$env:RUNNER_TEMP/collector-selection" -ApplyToProcess
+          # No application links are claimed here: those required inputs remain unresolved.
+          ./packaging/windows/collect-installed-toolchain.ps1 -OutputDirectory "$env:RUNNER_TEMP/collection" -RustToolchain '1.99.0-x86_64-pc-windows-msvc'
       - name: Validate diagnostic JSON without environment values
         id: safe
         if: ${{ always() }}
         shell: pwsh
         run: |
           $found = $false
-          foreach ($name in 'selection','probe') {
+          foreach ($name in 'selection','probe','collector-selection','collection') {
             $public = "$env:RUNNER_TEMP/$name/public"
             if (Test-Path -LiteralPath $public) {
               python packaging/windows/validate-public-toolchain-evidence.py $public
@@ -55,3 +68,6 @@ jobs:
           path: |
             ${{ runner.temp }}/selection/public/*.json
             ${{ runner.temp }}/probe/public/*.json
+            ${{ runner.temp }}/collector-selection/public/*.json
+            ${{ runner.temp }}/collection/public/*.json
+            ${{ runner.temp }}/collection/public/legal/*

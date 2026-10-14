@@ -65,7 +65,7 @@ function Discover-Legal([string] $Root,[int] $Depth=0,[string] $Role='microsoft-
 try {
   $version=(& rustup run $RustToolchain rustc -Vv 2> (Join-Path $Private 'rustc-errors.txt') | Out-String).Trim()
   if ($LASTEXITCODE -ne 0) { throw 'PINNED_RUST_TOOLCHAIN_NOT_INSTALLED' }
-  if ($version -notmatch [regex]::Escape("commit-hash: $ExpectedRustCommit") -or $version -notmatch '(?m)^release: 1\.99\.0$') { throw 'UNEXPECTED_RUST_IDENTITY' }
+  if ($version -notmatch [regex]::Escape("commit-hash: $ExpectedRustCommit") -or $version -notmatch '(?m)^release: 1\.99\.0\r?$') { throw 'UNEXPECTED_RUST_IDENTITY' }
   $sysroot=(& rustup run $RustToolchain rustc --print sysroot 2>> (Join-Path $Private 'rustc-errors.txt') | Out-String).Trim()
   if ($LASTEXITCODE -ne 0) { throw 'RUST_SYSROOT_UNAVAILABLE' }
   $targetLib=(& rustup run $RustToolchain rustc --print target-libdir --target $Target 2>> (Join-Path $Private 'rustc-errors.txt') | Out-String).Trim()
@@ -134,7 +134,7 @@ try {
   # Explicit allowlist projection: no paths, environment dictionary, arguments, or raw linker text.
   $publicFiles=@($Files | ForEach-Object {[ordered]@{role=$_.role;name=$_.name;bytes=$_.bytes;sha256=$_.sha256;file_version=$_.file_version;legal_file=if($_.copy_scope -eq 'public-legal'){$_.copy_name}else{$null}}})
   $cargoRelease=if($cargoVersion -match '^cargo ([0-9.]+)'){$Matches[1]}else{$null}
-  $llvmVersion=if($version -match '(?m)^LLVM version: ([0-9.]+)$'){$Matches[1]}else{$null}
+  $llvmVersion=if($version -match '(?m)^LLVM version: ([0-9.]+)\r?$'){$Matches[1]}else{$null}
   $summary=[ordered]@{schema=2;evidence_only=$true;distribution_approved=$false;target=$Target;rust_release='1.99.0';rust_commit=$ExpectedRustCommit;cargo_release=$cargoRelease;llvm_version=$llvmVersion;msvc_toolset_version=(Get-NumericVersion $env:VCToolsVersion);windows_sdk_version=(Get-NumericVersion $sdkver);ucrt_version=(Get-NumericVersion $env:UCRTVersion);files=$publicFiles;missing_files=@($Missing.ToArray());unresolved=@($Issues | ForEach-Object {$_.code} | Sort-Object -Unique)}
   $summary | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $Public 'toolchain-summary.json') -Encoding utf8NoBOM
   Write-Output 'Toolchain evidence collected. Publish only public/; runner-local details remain private. Distribution approval is false.'
