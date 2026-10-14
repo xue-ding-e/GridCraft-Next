@@ -9,6 +9,22 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
+class RepositorySupplementTests(unittest.TestCase):
+    def test_checked_in_supplements_match_reviewed_original_bytes(self):
+        # Runs in the cheap Windows script job, before the real Rust build.
+        root = Path(__file__).parents[1] / "license-supplements"
+        config = json.loads((root / "supplements.json").read_text(encoding="utf-8"))
+        checked = set()
+        for package_id, items in config.items():
+            for item in items:
+                with self.subTest(package=package_id, path=item["path"]):
+                    self.assertRegex(item["origin_url"], r"\Ahttps://raw\.githubusercontent\.com/(emilk/egui|storytold/craft-libs)/[0-9a-f]{40}/LICENSE-(MIT|APACHE)\Z")
+                    data = MODULE.safe_file(root, item["path"])
+                    self.assertEqual(MODULE.digest(data), item["sha256"])
+                    checked.add(item["path"])
+        self.assertEqual(len(checked), 4)
+
+
 class LicenseCollectionTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -98,6 +114,16 @@ class LicenseCollectionTests(unittest.TestCase):
     def test_lock_source_mismatch_blocks_distribution(self):
         self.lock = self.lock.replace(b"1.0.0", b"2.0.0")
         self.assertIn("Cargo.lock", " ".join(self.collect()["problems"]))
+
+    def test_supplement_newline_conversion_is_rejected(self):
+        path = self.root / "extra-license.txt"
+        original = b"Synthetic supplemental text\nOriginal byte sequence\n"
+        item = {"source": self.source, "path": str(path), "sha256": MODULE.digest(original), "label": "LICENSE-APACHE", "origin_url": "https://example.invalid/fixed-sha/LICENSE-APACHE"}
+        path.write_bytes(original.replace(b"\n", b"\r\n"))
+        with self.assertRaisesRegex(MODULE.CollectionError, "unverified supplement"):
+            self.collect("rewritten", {self.pid: [item]})
+        path.write_bytes(original)
+        self.assertEqual(len(self.collect("original", {self.pid: [item]})["packages"][0]["files"]), 2)
 
     def test_flat_names_do_not_collide_for_nested_notices(self):
         nested = self.package / "vendor"

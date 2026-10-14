@@ -1,0 +1,13 @@
+# Preserve reviewed legal bytes and the lockfile fingerprint on Windows checkouts.
+# Do not repair or normalize these files in the collector: a hash mismatch is an error.
+/packaging/windows/license-supplements/** -text
+/Cargo.lock -text
+/LICENSE-MIT -text
+/LICENSE-APACHE -text
+/LICENSE -text
+/COPYRIGHT -text
+/NOTICE -text
+/ATTRIBUTION.md -text
+/README.md -text
+/assets/app-icon/LICENSE.txt -text
+/docs/brand/LICENSE-brand.txt -text
