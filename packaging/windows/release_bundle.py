@@ -220,7 +220,28 @@ def check_evidence(evidence, root, source_sha, full_version, msi_version, packag
     return review
 
 
-def check_portable(path, evidence, full_version):
+def check_internal_content(name, data, root):
+    # Preserve source NOTICE/README history without treating a description of
+    # old internal packages as a marker on this package. This exception is only
+    # for exact source bytes; renaming a banner or changing its hash cannot pass.
+    content = data.lower().replace(b"\0", b"").removeprefix(b"\xef\xbb\xbf")
+    if b"internal validation only" not in content and MARKER.lower().encode() not in content:
+        return
+    source = Path(root) / name
+    require(name in {"NOTICE", "README.md"} and source.is_file() and not source.is_symlink()
+            and source.read_bytes() == data, "internal validation marker outside exact source NOTICE/README")
+    # Remove only the one known historical sentence for scanning, never the
+    # file's actual bytes. Even a source-identical added warning must still fail.
+    history = {
+        "NOTICE": b"Unreviewed internal-validation-only packages are not distributable.",
+        "README.md": b"Those baseline packages were internal-validation-only.",
+    }
+    remaining = data.replace(history[name], b"", 1).lower().replace(b"\0", b"")
+    require(b"internal validation only" not in remaining and MARKER.lower().encode() not in remaining,
+            "internal validation marker beyond the known source explanation")
+
+
+def check_portable(path, evidence, full_version, root):
     prefix = f"gridcraft-next-{full_version}-windows-x64-portable/"
     native = evidence["native"]
     expected = {row["Name"]: row["Sha256"] for row in native["legal_payload"]}
@@ -240,7 +261,7 @@ def check_portable(path, evidence, full_version):
             data = archive.read(info)
             actual[name] = sha256(data)
             if not name.endswith(".exe"):
-                require(b"internal validation only" not in data.lower() and MARKER.lower().encode() not in data.lower(), "internal validation marker in package content")
+                check_internal_content(name, data, root)
             if name == "THIRD_PARTY_INVENTORY.json":
                 inventory = json.loads(data.decode("utf-8-sig"), object_pairs_hook=unique_object)
                 fingerprint = inventory.pop("review_fingerprint")
@@ -270,7 +291,7 @@ def validate_bundle(directory, root, source_sha, repository, run_id, attempt):
     require(manifest["packages"] == packages and manifest["evidence"] == facts["RELEASE-EVIDENCE.json"], "asset hash mismatch")
     evidence = read_json(directory / "RELEASE-EVIDENCE.json")
     check_evidence(evidence, root, source_sha, full_version, msi_version, packages)
-    check_portable(directory / names[1], evidence, full_version)
+    check_portable(directory / names[1], evidence, full_version, root)
     with (directory / names[0]).open("rb") as msi:
         require(msi.read(8) == bytes.fromhex("d0cf11e0a1b11ae1"), "MSI container required")
     sums = "".join(f"{facts[name]['sha256']}  {name}\n" for name in sorted(expected_files - {"SHA256SUMS"}))
@@ -301,7 +322,7 @@ def prepare(args):
                 "native": {"status": native["status"], "checks": native["checks"], "cleanup_errors": native["cleanupErrors"],
                            "inputs": inputs, "legal_payload": native["legalPayload"], "pe": [{k: row[k] for k in ("name", "machine", "subsystem", "signature")} for row in native["pe"]]}}
     check_evidence(evidence, root, args.source_sha, full_version, msi_version, packages)
-    check_portable(args.dist / package_names(full_version)[1], evidence, full_version)
+    check_portable(args.dist / package_names(full_version)[1], evidence, full_version, root)
     require(not args.output.exists(), "release bundle output must be new")
     args.output.mkdir(parents=True)
     for name in packages:

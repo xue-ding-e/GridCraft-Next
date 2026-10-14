@@ -104,8 +104,105 @@ class BundleTests(unittest.TestCase):
         bundle.write_json(self.output / "release-manifest.json", self.manifest)
         refresh_sums(self.output)
 
+    def replace_portable_legal(self, replacements):
+        path = self.output / bundle.package_names(FULL_VERSION)[1]
+        prefix = f"gridcraft-next-{FULL_VERSION}-windows-x64-portable/"
+        with zipfile.ZipFile(path) as archive:
+            files = {info.filename: archive.read(info) for info in archive.infolist()}
+        legal = {row["Name"]: row["Sha256"] for row in self.evidence["native"]["legal_payload"]}
+        for name, data in replacements.items():
+            files[prefix + name] = data
+            legal[name] = bundle.sha256(data)
+        with zipfile.ZipFile(path, "w") as archive:
+            for name, data in files.items(): archive.writestr(name, data)
+        self.evidence["native"]["legal_payload"] = [{"Name": name, "Sha256": digest} for name, digest in legal.items()]
+        fact = bundle.file_fact(path)
+        self.evidence["native"]["inputs"][path.name] = fact
+        self.manifest["packages"][path.name] = fact
+        self.rewrite_evidence()
+
+    def install_real_source_descriptions(self):
+        descriptions = {name: (SCRIPTS.parents[1] / name).read_bytes() for name in ("NOTICE", "README.md")}
+        for name, data in descriptions.items():
+            self.assertIn(b"internal-validation-only", data.lower())
+            (self.root / name).write_bytes(data)
+        self.replace_portable_legal(descriptions)
+        return descriptions
+
     def test_consistent_synthetic_contract_is_accepted(self):
         self.assertEqual(self.validate()["source_sha"], SOURCE)
+
+    def test_exact_real_source_notice_and_readme_history_is_not_a_package_marker(self):
+        descriptions = self.install_real_source_descriptions()
+        self.validate()
+        for name, data in descriptions.items():
+            self.assertEqual((self.root / name).read_bytes(), data)
+
+    def test_source_description_exemption_requires_exact_complete_source_bytes(self):
+        descriptions = self.install_real_source_descriptions()
+        self.replace_portable_legal({"NOTICE": descriptions["NOTICE"] + b"\nChanged after source review.\n"})
+        with self.assertRaisesRegex(ValueError, "outside exact source"): self.validate()
+
+    def test_source_description_exemption_does_not_apply_to_other_names(self):
+        descriptions = self.install_real_source_descriptions()
+        self.replace_portable_legal({"copied-NOTICE.txt": descriptions["NOTICE"]})
+        with self.assertRaisesRegex(ValueError, "outside exact source"): self.validate()
+
+    def test_renamed_actual_internal_banner_remains_blocked(self):
+        banner = b"INTERNAL VALIDATION ONLY. Do not distribute this package. Review and rebuild without -ValidationOnly before publishing.\r\n"
+        self.install_real_source_descriptions()
+        self.replace_portable_legal({"renamed-notice.txt": banner})
+        with self.assertRaisesRegex(ValueError, "internal validation marker"): self.validate()
+
+    def test_actual_banner_is_forbidden_even_when_renamed_to_exact_source_notice(self):
+        for banner in (b"INTERNAL VALIDATION ONLY. Do not distribute this package.\n",
+                       b"\xef\xbb\xbfINTERNAL-VALIDATION-ONLY\r\nDo not distribute this package.\r\n",
+                       "INTERNAL VALIDATION ONLY. Do not distribute this package.\r\n".encode("utf-16-le")):
+            with self.subTest(banner=banner):
+                (self.root / "NOTICE").write_bytes(banner)
+                self.replace_portable_legal({"NOTICE": banner})
+                with self.assertRaisesRegex(ValueError, "internal validation marker"): self.validate()
+
+    def test_source_identical_history_plus_new_inline_banner_is_still_rejected(self):
+        descriptions = self.install_real_source_descriptions()
+        for name in ("NOTICE", "README.md"):
+            with self.subTest(name=name):
+                changed = descriptions[name] + b"\nWARNING: INTERNAL VALIDATION ONLY. Do not distribute this package.\n"
+                (self.root / name).write_bytes(changed)
+                self.replace_portable_legal({name: changed})
+                with self.assertRaisesRegex(ValueError, "beyond the known source explanation"): self.validate()
+                (self.root / name).write_bytes(descriptions[name])
+                self.replace_portable_legal({name: descriptions[name]})
+
+    def test_new_source_description_is_not_an_automatic_marker_exemption(self):
+        descriptions = self.install_real_source_descriptions()
+        changed = descriptions["NOTICE"] + b"\nThis package is internal-validation-only.\n"
+        (self.root / "NOTICE").write_bytes(changed)
+        self.replace_portable_legal({"NOTICE": changed})
+        with self.assertRaisesRegex(ValueError, "beyond the known source explanation"): self.validate()
+
+    def test_source_identical_sentence_or_markdown_banner_is_not_exempted(self):
+        for banner in (b"This package is INTERNAL VALIDATION ONLY. Do not distribute.\n",
+                       b"# INTERNAL-VALIDATION-ONLY\nDo not distribute.\n"):
+            with self.subTest(banner=banner):
+                (self.root / "NOTICE").write_bytes(banner)
+                self.replace_portable_legal({"NOTICE": banner})
+                with self.assertRaisesRegex(ValueError, "beyond the known source explanation"): self.validate()
+
+    def test_internal_marker_filename_remains_forbidden_with_innocent_content(self):
+        self.install_real_source_descriptions()
+        self.replace_portable_legal({"INTERNAL-VALIDATION-ONLY.txt": b"innocent replacement content"})
+        with self.assertRaisesRegex(ValueError, "internal"): self.validate()
+
+    def test_exact_source_descriptions_never_override_internal_or_unapproved_legal_status(self):
+        self.install_real_source_descriptions()
+        for key, invalid in (("validation_only", True), ("distribution_approved", False), ("legal_review_approved", False)):
+            with self.subTest(key=key):
+                original = self.evidence["legal_status"][key]
+                self.evidence["legal_status"][key] = invalid
+                self.rewrite_evidence()
+                with self.assertRaisesRegex(ValueError, "not distribution eligible"): self.validate()
+                self.evidence["legal_status"][key] = original
 
     def test_checksum_fixture_preserves_canonical_name_order_and_lf(self):
         data = (self.output / "SHA256SUMS").read_bytes()
