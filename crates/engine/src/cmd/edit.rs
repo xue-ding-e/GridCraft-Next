@@ -525,6 +525,11 @@ pub(super) fn go_to(s: &mut Session, p: &Json) -> Result<Json> {
     selection_set(s, &json!({"range": resolved}))
 }
 
+// Bound both the scan and the returned selection. The area limit is a resource bound,
+// not a guarantee of interactive UI performance; never silently return only some matches.
+const MAX_SPECIAL_CELLS: u64 = 4_000_000;
+const MAX_SPECIAL_AREAS: usize = 65_536;
+
 fn go_to_special(s: &mut Session, p: &Json) -> Result<Json> {
     let kind = str_param(p, "kind").unwrap_or("blanks");
     let d = s.doc()?;
@@ -538,8 +543,11 @@ fn go_to_special(s: &mut Session, p: &Json) -> Result<Json> {
         return select_region(s, &json!({}));
     }
     let mut hits: Vec<CellRef> = Vec::new();
-    if scope.count() > 4_000_000 {
-        return Err(bad("edit.goToSpecial", "range too large"));
+    if scope.count() > MAX_SPECIAL_CELLS {
+        return Err(bad(
+            "edit.goToSpecial",
+            format!("The range exceeds {MAX_SPECIAL_CELLS} cells. Select a single relevant column or a smaller range, or work in batches."),
+        ));
     }
     for c in scope.iter() {
         let cell = sheet.cell(c);
@@ -564,14 +572,14 @@ fn go_to_special(s: &mut Session, p: &Json) -> Result<Json> {
     if hits.is_empty() {
         return Err(EngineError::Other("No cells were found.".into()));
     }
-    let ranges = coalesce(&hits);
+    let ranges = coalesce(&hits)?;
     let d = s.doc_mut()?;
     d.selection = crate::Selection { active: hits[0], anchor: hits[0], ranges };
     Ok(json!({"selection": d.selection.a1(), "count": hits.len()}))
 }
 
 /// Merges cells into vertical runs per column (a compact multi-area selection).
-fn coalesce(cells: &[CellRef]) -> Vec<RangeRef> {
+fn coalesce(cells: &[CellRef]) -> Result<Vec<RangeRef>> {
     let mut sorted = cells.to_vec();
     sorted.sort_by_key(|c| (c.col, c.row));
     let mut out: Vec<RangeRef> = Vec::new();
@@ -584,12 +592,17 @@ fn coalesce(cells: &[CellRef]) -> Vec<RangeRef> {
             last.end.row = c.row;
             continue;
         }
+        if out.len() == MAX_SPECIAL_AREAS {
+            return Err(bad(
+                "edit.goToSpecial",
+                format!(
+                    "The matches exceed {MAX_SPECIAL_AREAS} separate areas. Select a smaller range or work in batches; the selection was not changed."
+                ),
+            ));
+        }
         out.push(RangeRef::cell(c));
     }
-    if out.len() > 2000 {
-        out.truncate(2000);
-    }
-    out
+    Ok(out)
 }
 
 // ---------------------------------------------------------------- history
