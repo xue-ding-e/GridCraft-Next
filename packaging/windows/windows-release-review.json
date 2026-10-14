@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "status": "approved",
+  "inventory_review_fingerprint": "010726b0f2b27407dc5c7315b7e5fd388e547342dba1223f08fa4bca6e18fef6",
+  "toolchain_review_fingerprint": "936bfeda1e4b4cf237ca28238a947d24a5542bce9612921a02de6082ced9b36a",
+  "required_toolchain_notices": {
+    "074e6e32c86a4c0e-Apache-2.0.txt": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff",
+    "3823dda7cf046602-libm-LICENSE.txt": "3823dda7cf046602f4b4e77ec8e227863dc4736037cc85bb33d9f19febe16bb7",
+    "5647be074c8edf73-COPYRIGHT-library.html": "5647be074c8edf7339fd863055923a8fc80bc5610a8d4661ec3b767b9d392c27",
+    "Visual-Studio-2022-Enterprise-Professional-License-EN.docx": "9c0cd52b20db9d081854c75bd1b50c75514b8f8cb09c8cad15e89d90b97b5bf3",
+    "WINDOWS-RUNTIME-LICENSE-NOTICE.txt": "765de651c4d1eda33c25aa09fd179a50d2f132a01f1201b1ef823a48b2757ed4",
+    "ab6eec6caf0fa577-compiler-builtins-LICENSE.txt": "ab6eec6caf0fa5775e411c7a8bc6a45c4ef2956b0980b157ab74fc5cd62a928b",
+    "b85dcd3e453d0598-MIT.txt": "b85dcd3e453d05982552c52b5fc9e0bdd6d23c6f8e844b984a88af32570b0cc0",
+    "f5062c9a188d81df-Unicode-3.0.txt": "f5062c9a188d81dfe66b56db4182dcf9e4b17c0d9b0d311a8e20b3a1b075c443",
+    "sdk_license.rtf": "0f4a26ac9dc50066f8a1bfeaaf3f092d1b9e4791df5487b9f3c31e7c3dc4d7f5"
+  }
+}
