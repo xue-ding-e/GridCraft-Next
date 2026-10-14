@@ -13,16 +13,19 @@ Based on GridCraft by the ArtCraft team and the GridCraft contributors. This pro
 - This repository starts from a source snapshot, without republishing upstream Git history or its old release tags. Original authors, contributor records, licenses and asset attribution are retained.
 - Restricted ArtCraft logo/mark artwork is excluded. The original open-licensed placeholder application icon is retained with its attribution.
 
-This initial import establishes the independent identity and development baseline. It does not claim that the data-fidelity bugs or performance goals below are fixed. The inherited engine, number representation and file-format behavior remain under evaluation. Native installers, full cross-platform CI and release packaging have not yet been independently validated for GridCraft-Next.
+The independent source baseline now includes four targeted fixes: lossless CSV identifier inference and Text-format editing, AutoFilter's empty-text blank category, one-pass scattered row deletion for plain workbooks, and complete bounded Go To Special selection. Synthetic regression tests and all eight `cargo xtask ci` gates passed for [source commit 5b93a711](https://github.com/xue-ding-e/GridCraft-Next/commit/5b93a711489a53232f4a5b4f50b5864fe2d9582d) in [this Linux/WASM CI run](https://github.com/xue-ding-e/GridCraft-Next/actions/runs/38573291767).
 
-Automatic release publication, signing and Pages deployment are disabled. The only active workflow runs read-only CI checks. There are no GridCraft-Next binary releases to download yet.
+These fixes do not replace floating-point arithmetic with an exact decimal financial engine. Native Windows installation, upgrade/uninstall, default-renderer GUI interaction, dependency notices, and distributable packaging are being validated separately; no successful Windows run or downloadable package is claimed yet.
 
-## Work planned
+Automatic release publication, signing and Pages deployment are disabled. CI has read-only repository permissions. Initial Windows packages are marked internal-validation-only and stay inside a disposable runner; only synthetic diagnostic evidence may be uploaded. There are no GridCraft-Next binary releases to download yet.
 
-1. Preserve long numeric identifiers and leading zeros during CSV import, editing and export, with explicit regression tests for parsing decisions.
-2. Investigate numeric precision and financial workflows, documenting what is exact and what remains limited by floating-point representation.
-3. Improve large-sheet opening, filtering, insertion, updates, deletion and saving. Measure latency and memory with reproducible synthetic datasets before making performance claims.
-4. Cover blank values, repeated operations, undo/redo and round trips so editing fixes do not silently change data.
+## Verified changes and remaining work
+
+1. CSV import preserves long numeric identifiers and leading zeros as text. [Import tests](crates/xlsx/src/tests/csv_tests.rs), [editing/XLSX tests](crates/engine/tests/csv_identifier_editing.rs), and [GUI event tests](crates/ui-egui/tests/identifier_text_input.rs) cover the contract; see [CLI data types](docs/cli.md).
+2. AutoFilter groups missing cells, stored empty text and `=""` results together without treating whitespace or zero as blank. [Tests](crates/engine/tests/autofilter_blank_values.rs) cover XLSX round trips, dropdown deduplication, reapply, undo and redo.
+3. Bulk row deletion remaps plain workbook data once instead of repeatedly moving it for each scattered span. Complex workbooks retain the general path. [Regression tests](crates/engine/src/cmd/sheet_bulk_tests.rs) cover retained values and undo/redo; a large plain synthetic benchmark does not establish performance for formula-heavy workbooks.
+4. Go To Special no longer silently truncates selections at 3,000 matching cells. [Bounds and behavior](docs/large-selections.md) and [selection tests](crates/engine/tests/go_to_special_selection.rs) document complete results or explicit rejection.
+5. Remaining work includes native Windows delivery validation, broader cross-platform packaging, formula-heavy large-sheet performance, and an explicit financial precision contract. Ordinary numeric cells still use the inherited floating-point representation.
 
 Only synthetic tests and public upstream assets belong in this repository. Do not commit private customer spreadsheets or production datasets.
 
@@ -34,7 +37,7 @@ Use the existing source commands below and the project's `cargo xtask ci` gate. 
 
 ## Screenshots
 
-Inherited marketing screenshots are omitted from this import pending independent provenance review. Replacement screenshots will be generated from GridCraft-Next using synthetic workbooks. No screenshot currently demonstrates that the planned fixes have passed validation.
+Inherited marketing screenshots are omitted pending independent provenance review. Only newly captured GridCraft-Next screenshots using synthetic workbooks will be added after review; no screenshots are included in this repository yet.
 
 ## Inherited capabilities
 

@@ -4,6 +4,50 @@ Modified on 2026-10-14 for the independent derivative. Automatic release, signin
 
 Local packaging scripts are being adapted for independent application IDs, installation paths and license inclusion. Their Windows/macOS/Linux/FreeBSD output still requires platform-specific validation before release. The macOS upstream branded Finder layout is not used.
 
+## Independent Windows validation policy
+
+The first delivery target is unsigned Windows x64, tested on a disposable GitHub
+`windows-2022` runner using the real Rust GUI and CLI. Source CI success is separate
+from installation, native input, rendering, upgrade, repair and uninstall evidence.
+The original project's C# installer fixtures do not establish Rust application behavior.
+No Windows validation result or public installer is claimed by this policy alone.
+
+`packaging/windows/version.ps1` is the single authoritative MSI version converter:
+
+- Accepted input is canonical `M.m.p-next.N` or stable `M.m.p`.
+- `M`, `m` and `p` must each be in `0..255`; `N` must be in `0..254`.
+- MSI `ProductVersion` is `M.m.(256*p+N)` for a Next prerelease. Stable releases use
+  the reserved rank `255`: `M.m.(256*p+255)`.
+- Thus `0.6.1-next.0` becomes `0.6.256`, `0.6.1-next.254` becomes `0.6.510`,
+  stable `0.6.1` becomes `0.6.511`, and `0.6.2-next.0` becomes `0.6.512`.
+- Leading zeroes, unknown prerelease labels, metadata, whitespace and overflow are
+  rejected. The largest accepted stable version is `255.255.255`, encoded as
+  `255.255.65535`. Never wrap, truncate or reuse ranks; changing this finite policy
+  after distribution requires an explicit migration design.
+
+Full SemVer is retained in filenames, CLI output and descriptive MSI metadata.
+`GRIDCRAFT_VERSION` may only equal the Cargo workspace version. The independent
+UpgradeCode is `73F9F3B2-548C-4F5B-8934-253B3C29E0B1`; it is never the upstream
+upgrade family. Equal-version packages with different ProductCodes are rejected,
+while maintenance using the identical original MSI remains permitted.
+`test-version.ps1` exhausts all 65,536 patch/rank encodings; `test-msi-version.ps1`
+checks emitted MSI tables. Actual transition and coexistence tests are still required.
+
+The legal gate inventories packages actually observed in the locked GUI/CLI build,
+conservatively retaining host build-input notices too. Original license/NOTICE bytes,
+copyright attribution and all embedded-font obligations are preserved. Missing texts
+or an unreviewed inventory fingerprint block distribution. `-ValidationOnly` permits
+marked packages solely for in-runner tests; it cannot approve a public artifact.
+The final CI aggregation stays failed until every runtime and legal layer passes.
+
+No signing secrets or security exceptions are configured. An eventual unsigned
+download may trigger SmartScreen or local policy warnings; do not disable protections,
+remove security markings, or bypass warnings to make a test pass. Hosted-server
+results do not certify every Windows 10/11 device or GPU.
+
+References: [MSI ProductVersion limits](https://learn.microsoft.com/en-us/windows/win32/msi/productversion),
+[WiX upgrade policy](https://docs.firegiant.com/wix/schema/wxs/majorupgrade/).
+
 The remainder of this file is the retained upstream release playbook for provenance and engineering reference. It describes the original project, not an enabled GridCraft-Next release process. In particular, pushing a release branch in this repository does not create or publish releases.
 
 ## Historical upstream release instructions
