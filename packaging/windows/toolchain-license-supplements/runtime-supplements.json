@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "evidence_only": true,
+  "applicable_rust_release": "1.99.0",
+  "applicable_rust_commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+  "target": "x86_64-pc-windows-msvc",
+  "files": [
+    {
+      "file": "compiler-builtins-LICENSE.txt",
+      "source_repository": "https://github.com/rust-lang/rust",
+      "source_commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "source_url": "https://raw.githubusercontent.com/rust-lang/rust/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/compiler-builtins/LICENSE.txt",
+      "source_receipt_file": "rust-library__compiler-builtins__LICENSE.txt",
+      "original_sha256": "ab6eec6caf0fa5775e411c7a8bc6a45c4ef2956b0980b157ab74fc5cd62a928b",
+      "bytes": 15078,
+      "component": "compiler_builtins 0.1.160",
+      "basis": "The fixed compiler_builtins manifest licenses the embedded target runtime under MIT AND Apache-2.0 WITH LLVM-exception AND (MIT OR Apache-2.0); its root license supplies the MIT/compiler-rt notices and LLVM exception.",
+      "collector_role": "rust-runtime-fixed-commit-license",
+      "required_public_legal_basename": "ab6eec6caf0fa577-compiler-builtins-LICENSE.txt"
+    },
+    {
+      "file": "libm-LICENSE.txt",
+      "source_repository": "https://github.com/rust-lang/rust",
+      "source_commit": "b940084d7eb6a299eb4bfeb8e34901bc051e7ac4",
+      "source_url": "https://raw.githubusercontent.com/rust-lang/rust/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/compiler-builtins/libm/LICENSE.txt",
+      "source_receipt_file": "rust-library__compiler-builtins__libm__LICENSE.txt",
+      "original_sha256": "3823dda7cf046602f4b4e77ec8e227863dc4736037cc85bb33d9f19febe16bb7",
+      "bytes": 14088,
+      "component": "compiler_builtins bundled math module",
+      "basis": "The fixed compiler-builtins root license expressly identifies its bundled math module and points to libm/LICENSE.txt for the original copyright notices.",
+      "collector_role": "rust-runtime-fixed-commit-license",
+      "required_public_legal_basename": "3823dda7cf046602-libm-LICENSE.txt"
+    }
+  ],
+  "required_public_legal": {
+    "ab6eec6caf0fa577-compiler-builtins-LICENSE.txt": "ab6eec6caf0fa5775e411c7a8bc6a45c4ef2956b0980b157ab74fc5cd62a928b",
+    "3823dda7cf046602-libm-LICENSE.txt": "3823dda7cf046602f4b4e77ec8e227863dc4736037cc85bb33d9f19febe16bb7"
+  },
+  "producer_requirements": [
+    "Verify actual rustc release and commit against applicable_rust_release/applicable_rust_commit before incorporating these files.",
+    "Verify each byte count and SHA-256 against this manifest; read only the two listed relative basenames from this committed supplement directory.",
+    "Copy original bytes through the existing public-legal Record-File path with the specified collector_role; retain exact required_public_legal_basename and verify public bytes using the strict public evidence validator.",
+    "Bind this manifest, the two original texts, and the final required-public-legal map into the reviewed materials fingerprint.",
+    "Require the same two public legal basename/hash entries and byte-identical payloads in the final staging directory, MSI-installed payload and portable ZIP; do not treat mere documentation presence as release authorization."
+  ]
+}

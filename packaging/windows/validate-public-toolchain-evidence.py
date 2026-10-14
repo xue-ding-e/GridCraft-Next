@@ -16,6 +16,12 @@ COMMIT = re.compile(r"[a-f0-9]{40}\Z")
 CODE = re.compile(r"[A-Z][A-Z0-9_]*\Z")
 ROLE = re.compile(r"[a-z][a-z0-9-]*\Z")
 LEGAL_EXTENSIONS = {'', '.txt', '.rtf', '.html', '.htm', '.md'}
+# One fixed official legal document, not a general Office/archive exception.
+PINNED_LEGAL_DOCUMENTS = {
+    'Visual-Studio-2022-Enterprise-Professional-License-EN.docx':
+        ('9c0cd52b20db9d081854c75bd1b50c75514b8f8cb09c8cad15e89d90b97b5bf3', 63513),
+}
+
 LEGAL_NAME = re.compile(r'license|eula|redist|third.?party|notice|copyright|^MIT\.txt$|^Apache-2\.0\.txt$|^Unicode-3\.0\.txt$', re.I)
 COMMON = {'schema', 'evidence_only', 'distribution_approved', 'unresolved'}
 SCHEMAS = {
@@ -135,9 +141,11 @@ def check(directory):
                 version(item['file_version'], 'INVALID_FILE_VERSION', nullable=True)
                 if item['legal_file'] is not None:
                     require(basename(item['legal_file']), 'UNSAFE_LEGAL_FILENAME')
-                    require(Path(item['name']).suffix.lower() in LEGAL_EXTENSIONS
-                            and Path(item['legal_file']).suffix.lower() in LEGAL_EXTENSIONS
-                            and LEGAL_NAME.search(item['name']) is not None, 'UNSAFE_LEGAL_FILE_TYPE')
+                    pinned_document = PINNED_LEGAL_DOCUMENTS.get(item['name']) == (item['sha256'], item['bytes'])
+                    ordinary_text = (Path(item['name']).suffix.lower() in LEGAL_EXTENSIONS
+                                     and Path(item['legal_file']).suffix.lower() in LEGAL_EXTENSIONS
+                                     and LEGAL_NAME.search(item['name']) is not None)
+                    require(ordinary_text or pinned_document, 'UNSAFE_LEGAL_FILE_TYPE')
                     require(item['legal_file'] == item['sha256'][:16] + '-' + item['name'], 'INVALID_LEGAL_FILE_BINDING')
                     require(item['bytes'] <= 8 * 1024 * 1024, 'LEGAL_FILE_TOO_LARGE')
                     rel = 'legal/' + item['legal_file']; f = root / rel

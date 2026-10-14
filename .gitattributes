@@ -11,3 +11,5 @@
 /README.md -text
 /assets/app-icon/LICENSE.txt -text
 /docs/brand/LICENSE-brand.txt -text
+/packaging/windows/toolchain-license-supplements/** -text
+/packaging/windows/microsoft-runtime-terms/** -text
