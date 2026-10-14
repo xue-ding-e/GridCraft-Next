@@ -1,0 +1,194 @@
+{
+  "registry+https://github.com/rust-lang/crates.io-index#ecolor@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#eframe@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#egui@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#egui_extras@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#egui-wgpu@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#egui-winit@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#egui_glow@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#emath@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#epaint@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "registry+https://github.com/rust-lang/crates.io-index#epaint_default_fonts@0.36.2": [
+    {
+      "path": "egui-0.36.2/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "95ca92f5f8ea5231f1580b3a2a799e8260af3114b900e1def5355a7f44bcf60c",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-MIT"
+    },
+    {
+      "path": "egui-0.36.2/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "origin_url": "https://raw.githubusercontent.com/emilk/egui/49682f8baa058bf49e011035cfbd6e825f88a5ef/LICENSE-APACHE"
+    }
+  ],
+  "craft-ui@0.1.0": [
+    {
+      "path": "craft-libs-d27646a/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "2f42c0cafc8ad394d91373fe1f342aee5453850b151a51405c68cae9ada86d26",
+      "source": "git+https://github.com/storytold/craft-libs?rev=d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d#d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d",
+      "origin_url": "https://raw.githubusercontent.com/storytold/craft-libs/d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d/LICENSE-MIT"
+    },
+    {
+      "path": "craft-libs-d27646a/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "source": "git+https://github.com/storytold/craft-libs?rev=d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d#d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d",
+      "origin_url": "https://raw.githubusercontent.com/storytold/craft-libs/d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d/LICENSE-APACHE"
+    }
+  ],
+  "craft-print@0.1.0": [
+    {
+      "path": "craft-libs-d27646a/LICENSE-MIT",
+      "label": "upstream-root/LICENSE-MIT",
+      "sha256": "2f42c0cafc8ad394d91373fe1f342aee5453850b151a51405c68cae9ada86d26",
+      "source": "git+https://github.com/storytold/craft-libs?rev=d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d#d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d",
+      "origin_url": "https://raw.githubusercontent.com/storytold/craft-libs/d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d/LICENSE-MIT"
+    },
+    {
+      "path": "craft-libs-d27646a/LICENSE-APACHE",
+      "label": "upstream-root/LICENSE-APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "source": "git+https://github.com/storytold/craft-libs?rev=d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d#d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d",
+      "origin_url": "https://raw.githubusercontent.com/storytold/craft-libs/d27646a5f7c8b4fc85d9dd3213b8c88b58e0088d/LICENSE-APACHE"
+    }
+  ]
+}

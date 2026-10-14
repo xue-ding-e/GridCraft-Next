@@ -26,3 +26,12 @@ in this distribution. Its terms are retained as docs/brand/LICENSE-brand.txt.
 Original copyright and attribution remain applicable to the retained code and assets.
 Product identity, packaging, documentation and CI defaults have been modified
 for this independent project. No upstream sponsorship or endorsement is implied.
+
+Windows binary distribution notices
+
+The original "None" asset statement above is retained as upstream historical
+text; it is not a claim that a GridCraft-Next executable contains no third-party
+material. The Windows packaging gate separately inventories the actual Cargo
+build inputs, including embedded default fonts, and preserves their original
+copyright, license and notice texts in THIRD_PARTY_NOTICES.txt and its named
+license files. Unreviewed internal-validation-only packages are not distributable.

@@ -17,15 +17,21 @@
 
 .EXAMPLE
   pwsh packaging/windows/package.ps1 -Arch x64
-  pwsh packaging/windows/package.ps1 -Arch x86 -SkipBuild
+  pwsh packaging/windows/package.ps1 -Arch x86
   pwsh packaging/windows/package.ps1 -Arch arm64     # cross-compiled; needs the MSVC ARM64 build tools
 #>
 param(
   [ValidateSet('x64', 'x86', 'arm64')] [string] $Arch = 'x64',
-  [switch] $SkipBuild
+  [switch] $SkipBuild,
+  # Disposable CI only: exercise the real application/installer before legal review.
+  # These packages must stay inside the runner and are never downloadable artifacts.
+  [switch] $ValidationOnly
 )
 $ErrorActionPreference = 'Stop'
 $Root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+if ($SkipBuild) {
+  throw '-SkipBuild is disabled: stale build records cannot prove the source/target identity of replacement binaries. Run a fresh locked build.'
+}
 
 function Invoke-Native([string] $What, [scriptblock] $Block) {
   Write-Output "==> $What"
@@ -44,6 +50,10 @@ $Target = switch ($Arch) { 'x64' { 'x86_64-pc-windows-msvc' } 'x86' { 'i686-pc-w
 $Dist = if ($env:DIST) { $env:DIST } else { Join-Path $Root 'dist\release' }
 $TargetDir = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { Join-Path $Root 'target' }
 New-Item -ItemType Directory -Force -Path $Dist | Out-Null
+$Evidence = Join-Path $TargetDir "windows-build-evidence\$Arch"
+New-Item -ItemType Directory -Force -Path $Evidence | Out-Null
+$BuildMessages = Join-Path $Evidence 'cargo-build.jsonl'
+$Metadata = Join-Path $Evidence 'cargo-metadata.json'
 
 if (-not $env:GRIDCRAFT_BUILD_SHA) { $env:GRIDCRAFT_BUILD_SHA = (git -C $Root rev-parse HEAD 2>$null) }
 if (-not $env:GRIDCRAFT_BUILD_DATE) { $env:GRIDCRAFT_BUILD_DATE = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd') }
@@ -57,7 +67,14 @@ if (-not $SkipBuild) {
   [Environment]::SetEnvironmentVariable($flagVar, '-C target-feature=+crt-static')
   # Fail the build (rather than warn) if the icon/VERSIONINFO can't be embedded.
   $env:GRIDCRAFT_REQUIRE_WINRES = '1'
-  Invoke-Native "cargo build ($Target)" { cargo build --release --locked -p gridcraft -p gridcraft-cli --target $Target }
+  Invoke-Native "cargo build ($Target)" {
+    cargo build --release --locked -p gridcraft -p gridcraft-cli --target $Target --message-format=json |
+      Tee-Object -FilePath $BuildMessages | Out-Null
+  }
+  Invoke-Native "cargo metadata ($Target)" {
+    cargo metadata --locked --format-version 1 --filter-platform $Target |
+      Out-File -FilePath $Metadata -Encoding utf8
+  }
 }
 
 $Bin = Join-Path $TargetDir "$Target\release"
@@ -86,6 +103,44 @@ Copy-Item (Join-Path $Bin 'gridcraft-cli.exe') (Join-Path $Stage 'gridcraft-next
 . (Join-Path $PSScriptRoot 'legal-files.ps1')
 $LegalDir = Join-Path $Stage 'licenses'
 Copy-PackageLegalFiles $Root $LegalDir
+# Collect the exact observed Cargo build inputs, not unrelated workspace/dev crates.
+# The conservative set also preserves host build-input notices without claiming they
+# all become linked code. All third-party legal files are flat, collision-proof names.
+$ThirdParty = Join-Path $Evidence 'third-party'
+if (Test-Path -LiteralPath $ThirdParty) { Remove-Item -LiteralPath $ThirdParty -Recurse -Force }
+$ReviewPath = Join-Path $PSScriptRoot 'license-review.json'
+$Review = if (Test-Path -LiteralPath $ReviewPath) { Get-Content -LiteralPath $ReviewPath -Raw | ConvertFrom-Json } else { $null }
+$CollectArgs = @(
+  (Join-Path $PSScriptRoot 'collect-licenses.py'), '--metadata', $Metadata,
+  '--build-messages', $BuildMessages, '--lockfile', (Join-Path $Root 'Cargo.lock'),
+  '--output', $ThirdParty, '--supplements', (Join-Path $PSScriptRoot 'license-supplements\supplements.json')
+)
+if ($Review -and $Review.reviewed_fingerprint) { $CollectArgs += @('--reviewed-fingerprint', $Review.reviewed_fingerprint) }
+& python @CollectArgs
+$LegalExit = $LASTEXITCODE
+if ($LegalExit -ne 0 -and $LegalExit -ne 2) { throw "Legal collection failed with exit code $LegalExit" }
+$DistributionApproved = ($LegalExit -eq 0)
+if (-not $DistributionApproved -and -not $ValidationOnly) {
+  throw 'Third-party legal inventory has not passed review. Distributable packaging is blocked.'
+}
+Copy-Item -LiteralPath (Join-Path $ThirdParty 'THIRD_PARTY_INVENTORY.json') -Destination $LegalDir
+Copy-Item -LiteralPath (Join-Path $ThirdParty 'THIRD_PARTY_NOTICES.txt') -Destination $LegalDir
+Get-ChildItem -LiteralPath $ThirdParty -File -Filter 'third-party-*' | Copy-Item -Destination $LegalDir
+if ($ValidationOnly) {
+  'INTERNAL VALIDATION ONLY. Do not distribute this package. Review and rebuild without -ValidationOnly before publishing.' |
+    Set-Content -LiteralPath (Join-Path $LegalDir 'INTERNAL-VALIDATION-ONLY.txt') -Encoding utf8
+}
+$LegalStatus = @{
+  source_sha = $env:GRIDCRAFT_BUILD_SHA
+  full_version = $Version
+  msi_version = $MsiVersion
+  distribution_approved = ($DistributionApproved -and -not $ValidationOnly)
+  legal_review_approved = $DistributionApproved
+  validation_only = [bool] $ValidationOnly
+  collector_exit = $LegalExit
+  inventory_sha256 = (Get-FileHash -LiteralPath (Join-Path $ThirdParty 'THIRD_PARTY_INVENTORY.json') -Algorithm SHA256).Hash.ToLowerInvariant()
+}
+$LegalStatus | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $Evidence 'legal-status.json') -Encoding utf8
 $LegalManifest = Join-Path $Stage 'legal.wxs'
 Write-PackageLegalManifest $LegalDir $LegalManifest
 
