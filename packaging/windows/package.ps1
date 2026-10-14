@@ -17,20 +17,30 @@
 
 .EXAMPLE
   pwsh packaging/windows/package.ps1 -Arch x64
-  pwsh packaging/windows/package.ps1 -Arch x86
-  pwsh packaging/windows/package.ps1 -Arch arm64     # cross-compiled; needs the MSVC ARM64 build tools
+  # Non-x64 packaging is diagnostic-only and has no public release approval:
+  pwsh packaging/windows/package.ps1 -Arch x86 -ValidationOnly
+  pwsh packaging/windows/package.ps1 -Arch arm64 -ValidationOnly # requires ARM64 build tools
 #>
 param(
   [ValidateSet('x64', 'x86', 'arm64')] [string] $Arch = 'x64',
   [switch] $SkipBuild,
   # Disposable CI only: exercise the real application/installer before legal review.
   # These packages must stay inside the runner and are never downloadable artifacts.
-  [switch] $ValidationOnly
+  [switch] $ValidationOnly,
+  # Hosted x64 CI: promote only exact reviewed inputs, otherwise retain an
+  # explicitly internal package for native diagnostics and a red eligibility gate.
+  [switch] $ReviewedOrValidation
 )
 $ErrorActionPreference = 'Stop'
 $Root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 if ($SkipBuild) {
   throw '-SkipBuild is disabled: stale build records cannot prove the source/target identity of replacement binaries. Run a fresh locked build.'
+}
+if ($Arch -ne 'x64' -and -not $ValidationOnly) {
+  throw 'Only Windows x64 has a reviewed release path. Other architectures require -ValidationOnly and stay internal.'
+}
+if ($ReviewedOrValidation -and ($ValidationOnly -or $Arch -ne 'x64')) {
+  throw '-ReviewedOrValidation is an exclusive x64 CI mode; other architectures are not release-validated.'
 }
 
 function Invoke-Native([string] $What, [scriptblock] $Block) {
@@ -78,6 +88,13 @@ if (-not $SkipBuild) {
 }
 
 $Bin = Join-Path $TargetDir "$Target\release"
+$ToolchainCapture = $null
+if ($Arch -eq 'x64') {
+  # Capture the exact just-built links/toolchain before any legal manifest or
+  # package is written. The outer finally path reuses the source-bound receipt.
+  $ToolchainCapture = & (Join-Path $PSScriptRoot 'collect-build-toolchain-evidence.ps1') `
+    -BinaryDirectory $Bin -SourceSha $env:GRIDCRAFT_BUILD_SHA
+}
 
 # Check both binaries' PE headers before packaging. Machine (COFF header) must match -Arch, so an
 # x64 build can never ship labelled arm64. Subsystem (optional header): 2 = Windows GUI, 3 = console.
@@ -109,7 +126,11 @@ Copy-PackageLegalFiles $Root $LegalDir
 $ThirdParty = Join-Path $Evidence 'third-party'
 if (Test-Path -LiteralPath $ThirdParty) { Remove-Item -LiteralPath $ThirdParty -Recurse -Force }
 $ReviewPath = Join-Path $PSScriptRoot 'license-review.json'
-$Review = if (Test-Path -LiteralPath $ReviewPath) { Get-Content -LiteralPath $ReviewPath -Raw | ConvertFrom-Json } else { $null }
+$Review = $null
+if (Test-Path -LiteralPath $ReviewPath) {
+  try { $Review = Get-Content -LiteralPath $ReviewPath -Raw | ConvertFrom-Json }
+  catch { Write-Warning 'Cargo review is unreadable; this build cannot be distribution-approved.' }
+}
 $CollectArgs = @(
   (Join-Path $PSScriptRoot 'collect-licenses.py'), '--metadata', $Metadata,
   '--build-messages', $BuildMessages, '--lockfile', (Join-Path $Root 'Cargo.lock'),
@@ -120,14 +141,29 @@ if ($Review -and $Review.reviewed_fingerprint) { $CollectArgs += @('--reviewed-f
 & python @CollectArgs
 $LegalExit = $LASTEXITCODE
 if ($LegalExit -ne 0 -and $LegalExit -ne 2) { throw "Legal collection failed with exit code $LegalExit" }
-$DistributionApproved = ($LegalExit -eq 0)
-if (-not $DistributionApproved -and -not $ValidationOnly) {
-  throw 'Third-party legal inventory has not passed review. Distributable packaging is blocked.'
-}
 Copy-Item -LiteralPath (Join-Path $ThirdParty 'THIRD_PARTY_INVENTORY.json') -Destination $LegalDir
 Copy-Item -LiteralPath (Join-Path $ThirdParty 'THIRD_PARTY_NOTICES.txt') -Destination $LegalDir
 Get-ChildItem -LiteralPath $ThirdParty -File -Filter 'third-party-*' | Copy-Item -Destination $LegalDir
-if ($ValidationOnly) {
+$ToolchainReviewApproved = $false
+if ($Arch -eq 'x64' -and $LegalExit -eq 0 -and $null -ne $ToolchainCapture -and $ToolchainCapture.capture_complete -eq $true) {
+  # Both review files, exact inventories, final binary/link hashes and selected
+  # original legal bytes are checked by one shared producer/consumer contract.
+  & python (Join-Path $PSScriptRoot 'stage_reviewed_toolchain.py') --root $Root `
+    --inventory (Join-Path $ThirdParty 'THIRD_PARTY_INVENTORY.json') --legal-directory $LegalDir `
+    --selection (Join-Path $env:RUNNER_TEMP 'gridcraft-toolchain-selection/public') `
+    --links (Join-Path $env:RUNNER_TEMP 'gridcraft-link-capture/public') `
+    --toolchain (Join-Path $env:RUNNER_TEMP 'gridcraft-toolchain-collection/public') `
+    --gui (Join-Path $Bin 'gridcraft.exe') --cli (Join-Path $Bin 'gridcraft-cli.exe')
+  $ToolchainReviewExit = $LASTEXITCODE
+  if ($ToolchainReviewExit -ne 0 -and $ToolchainReviewExit -ne 2) { throw 'Toolchain review helper failed unexpectedly.' }
+  $ToolchainReviewApproved = ($ToolchainReviewExit -eq 0)
+}
+$DistributionApproved = ($LegalExit -eq 0 -and $ToolchainReviewApproved)
+$InternalValidation = ([bool] $ValidationOnly -or ([bool] $ReviewedOrValidation -and -not $DistributionApproved))
+if (-not $DistributionApproved -and -not $InternalValidation) {
+  throw 'Exact Cargo/toolchain reviews and downstream originals are required. Distributable packaging is blocked.'
+}
+if ($InternalValidation) {
   'INTERNAL VALIDATION ONLY. Do not distribute this package. Review and rebuild without -ValidationOnly before publishing.' |
     Set-Content -LiteralPath (Join-Path $LegalDir 'INTERNAL-VALIDATION-ONLY.txt') -Encoding utf8
 }
@@ -135,9 +171,9 @@ $LegalStatus = @{
   source_sha = $env:GRIDCRAFT_BUILD_SHA
   full_version = $Version
   msi_version = $MsiVersion
-  distribution_approved = ($DistributionApproved -and -not $ValidationOnly)
+  distribution_approved = ($DistributionApproved -and -not $InternalValidation)
   legal_review_approved = $DistributionApproved
-  validation_only = [bool] $ValidationOnly
+  validation_only = [bool] $InternalValidation
   collector_exit = $LegalExit
   inventory_sha256 = (Get-FileHash -LiteralPath (Join-Path $ThirdParty 'THIRD_PARTY_INVENTORY.json') -Algorithm SHA256).Hash.ToLowerInvariant()
 }
