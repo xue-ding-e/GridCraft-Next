@@ -16,6 +16,14 @@ the upstream branded macOS Finder layout is not used.
 
 ## Manual Windows release promotion
 
+The artifact source commit and the publication-tooling commit are separately pinned.
+`source_sha` identifies the already-tested application, package manifest, original
+notices and Release tag; `publisher_sha` must equal the manual dispatch commit.
+Both checkouts are verified by Git HEAD. A publication-tool HTTP fix can promote
+unchanged bytes from the successful original CI run without rebuilding Rust.
+The Release body records both commits; a tooling commit is not claimed as the
+source of those binaries. All original CI, native, artifact and byte-hash gates remain.
+
 1. Review the actual target/feature-scoped Cargo inventory and installed toolchain
    originals. Record exact fingerprints in `license-review.json` and
    `windows-release-review.json`; the latter also maps required original toolchain
@@ -28,10 +36,12 @@ the upstream branded macOS Finder layout is not used.
    packages. Only a complete distribution-eligible result can produce the five-file
    `windows-release-<source-sha>-attempt-<attempt>` artifact. An internal marker,
    stale approval, missing notice, failed native test or missing evidence blocks it.
-4. Manually dispatch `windows-release.yml` at that exact source SHA with `source_sha`
-   and `ci_run_id`. The dispatcher code, completed CI run and producer artifact must
-   identify the same repository and SHA. The workflow rechecks the latest attempt,
-   every required job/step, artifact digest, package hashes and evidence.
+4. Manually dispatch `windows-release.yml` at the reviewed publication-tooling SHA
+   with `publisher_sha`, the exact artifact `source_sha` and `ci_run_id`. The completed
+   CI run, source checkout and producer artifact must identify the same repository
+   and source SHA; the tooling checkout must match the separate dispatch SHA.
+   The workflow rechecks the latest attempt, every required job/step, artifact digest,
+   package hashes and evidence.
 5. The sole publication job uses only the existing ephemeral Actions token with
    `contents: write`; build/verification jobs remain read-only. It creates a fresh
    draft, uploads the five assets, downloads and verifies them, creates the exact tag

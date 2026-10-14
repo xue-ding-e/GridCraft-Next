@@ -1,12 +1,16 @@
 # Promotion only: this workflow never rebuilds or substitutes its own CI gates.
-# Its code and the successful producer run must be at exactly source_sha.
+# The producer source and publication-tooling commits are independently pinned.
 name: GridCraft-Next reviewed Windows release
 
 on:
   workflow_dispatch:
     inputs:
       source_sha:
-        description: Exact reviewed 40-character SHA, also the dispatch ref's HEAD
+        description: Exact reviewed artifact source SHA from the successful producer run
+        required: true
+        type: string
+      publisher_sha:
+        description: Exact publication-tooling SHA, also the dispatch ref's HEAD
         required: true
         type: string
       ci_run_id:
@@ -37,13 +41,20 @@ jobs:
       - name: Require exact dispatch identity
         env:
           SOURCE_SHA: ${{ inputs.source_sha }}
+          PUBLISHER_SHA: ${{ inputs.publisher_sha }}
           CI_RUN_ID: ${{ inputs.ci_run_id }}
         run: |
-          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]] && [[ "$SOURCE_SHA" == "$GITHUB_SHA" ]]
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$PUBLISHER_SHA" =~ ^[0-9a-f]{40}$ ]] && [[ "$PUBLISHER_SHA" == "$GITHUB_SHA" ]]
           [[ "$CI_RUN_ID" =~ ^[1-9][0-9]*$ ]]
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.publisher_sha }}
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
           ref: ${{ inputs.source_sha }}
+          path: .release-source
           persist-credentials: false
       - name: Test release guards without credentials or network
         run: python3 -m unittest discover -s packaging/windows/tests -p 'test_release*.py' -v
@@ -52,10 +63,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_SHA: ${{ inputs.source_sha }}
+          PUBLISHER_SHA: ${{ inputs.publisher_sha }}
           CI_RUN_ID: ${{ inputs.ci_run_id }}
         run: |
           python3 packaging/windows/publish_release.py verify \
-            --source-sha "$SOURCE_SHA" --ci-run-id "$CI_RUN_ID" --repository "$GITHUB_REPOSITORY"
+            --source-sha "$SOURCE_SHA" --publisher-sha "$PUBLISHER_SHA" --root .release-source \
+            --ci-run-id "$CI_RUN_ID" --repository "$GITHUB_REPOSITORY"
 
   publish:
     name: Draft, upload, download-verify, then publish
@@ -70,17 +83,24 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.publisher_sha }}
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
           ref: ${{ inputs.source_sha }}
+          path: .release-source
           persist-credentials: false
       - name: Reverify provenance, create a fresh draft, verify downloads, publish
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_SHA: ${{ inputs.source_sha }}
+          PUBLISHER_SHA: ${{ inputs.publisher_sha }}
           CI_RUN_ID: ${{ inputs.ci_run_id }}
           ARTIFACT_ID: ${{ needs.verify.outputs.artifact_id }}
           ARTIFACT_DIGEST: ${{ needs.verify.outputs.artifact_digest }}
           CI_ATTEMPT: ${{ needs.verify.outputs.attempt }}
         run: |
           python3 packaging/windows/publish_release.py publish \
-            --source-sha "$SOURCE_SHA" --ci-run-id "$CI_RUN_ID" --repository "$GITHUB_REPOSITORY" \
+            --source-sha "$SOURCE_SHA" --publisher-sha "$PUBLISHER_SHA" --root .release-source \
+            --ci-run-id "$CI_RUN_ID" --repository "$GITHUB_REPOSITORY" \
             --artifact-id "$ARTIFACT_ID" --artifact-digest "$ARTIFACT_DIGEST" --attempt "$CI_ATTEMPT"

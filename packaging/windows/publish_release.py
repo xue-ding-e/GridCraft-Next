@@ -59,7 +59,11 @@ class Api:
         token = os.environ.get("GH_TOKEN")
         require(bool(token), "ephemeral Actions token is missing")
         headers = {"Authorization": "Bearer " + token, "X-GitHub-Api-Version": "2022-11-28",
-                   "User-Agent": "GridCraft-Next-reviewed-release", "Accept": "application/octet-stream" if output else "application/vnd.github+json"}
+                   "User-Agent": "GridCraft-Next-reviewed-release", "Accept": "application/vnd.github+json"}
+        # Actions artifact ZIP requests return a redirect using the GitHub API
+        # media type. Only the Release asset endpoint negotiates binary bytes.
+        if output is not None and re.fullmatch(re.escape(prefix) + r"releases/assets/[1-9][0-9]*", path):
+            headers["Accept"] = "application/octet-stream"
         body = json.dumps(data).encode() if data is not None else None
         if body is not None:
             headers["Content-Type"] = "application/json"
@@ -220,13 +224,14 @@ def require_new_tag_and_release(api, base, tag):
     require(not any(release["tag_name"] == tag for release in api.pages(f"{base}/releases")), "Release/draft already exists; never reuse or overwrite")
 
 
-def release_body(manifest, artifact):
+def release_body(manifest, artifact, publisher_sha=None):
     ci = manifest["ci"]
     repository = manifest["repository"]
     return (f"GridCraft-Next {manifest['full_version']} for Windows x64.\n\n"
             f"Source commit: {manifest['source_sha']}\n"
             f"Source: https://github.com/{repository}/tree/{manifest['source_sha']}\n"
-            f"MSI ProductVersion: {manifest['msi_version']}\n"
+            + (f"Publication tooling: https://github.com/{repository}/commit/{publisher_sha} (does not rebuild the packages)\n" if publisher_sha else "")
+            + f"MSI ProductVersion: {manifest['msi_version']}\n"
             f"Validated CI: https://github.com/{repository}/actions/runs/{ci['run_id']}/attempts/{ci['run_attempt']}\n"
             f"Producer artifact ID: {artifact['id']}\nArtifact digest: {artifact['digest']}\n\n"
             "Download the MSI for a machine-wide installation, or extract the portable ZIP and run gridcraft-next.exe. "
@@ -276,7 +281,7 @@ def verify_uploaded_assets(api, base, release_id, bundle, tag, public=False):
     return assets
 
 
-def publish(api, manifest, artifact, bundle):
+def publish(api, manifest, artifact, bundle, publisher_sha=None):
     repository = manifest["repository"]
     base = f"/repos/{repository}"
     tag = "v" + manifest["full_version"]
@@ -287,7 +292,7 @@ def publish(api, manifest, artifact, bundle):
     # Only this POST creates a release. Do not reuse IDs or overwrite assets.
     draft = api.request(f"{base}/releases", method="POST", data={
         "tag_name": tag, "target_commitish": manifest["source_sha"], "name": f"GridCraft-Next {manifest['full_version']}",
-        "body": release_body(manifest, artifact), "draft": True, "prerelease": "-" in manifest["full_version"], "make_latest": "false"})
+        "body": release_body(manifest, artifact, publisher_sha), "draft": True, "prerelease": "-" in manifest["full_version"], "make_latest": "false"})
     release_id = draft["id"]
     require(type(release_id) is int and release_id > 0
             and draft["url"] == f"https://api.github.com{base}/releases/{release_id}"
@@ -320,24 +325,32 @@ def publish(api, manifest, artifact, bundle):
     print(f"Published and download-verified: https://github.com/{repository}/releases/tag/{tag}")
 
 
+def verify_checkout_identity(root, source_sha, publisher_sha, repository):
+    require(SHA.fullmatch(source_sha) is not None and SHA.fullmatch(publisher_sha) is not None
+            and REPO.fullmatch(repository) is not None, "invalid exact source/publisher SHA or repository")
+    require(os.environ.get("GITHUB_ACTIONS") == "true" and os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
+            and os.environ.get("GITHUB_SHA") == publisher_sha and os.environ.get("GITHUB_REPOSITORY") == repository,
+            "manual dispatch must match the exact publication-tooling SHA")
+    publisher_root = Path(__file__).resolve().parents[2]
+    for checkout, expected, label in ((publisher_root, publisher_sha, "publisher"), (root, source_sha, "artifact source")):
+        head = subprocess.run(["git", "-C", str(checkout), "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()
+        require(head == expected, label + " checkout differs from its exact SHA")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("verify", "publish"))
     parser.add_argument("--source-sha", required=True)
+    parser.add_argument("--publisher-sha", required=True)
     parser.add_argument("--ci-run-id", required=True, type=int)
     parser.add_argument("--repository", required=True)
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
+    parser.add_argument("--root", type=Path, required=True, help="Separate checkout of the exact artifact source SHA")
     parser.add_argument("--artifact-id", type=int)
     parser.add_argument("--artifact-digest")
     parser.add_argument("--attempt", type=int)
     args = parser.parse_args()
     try:
-        require(SHA.fullmatch(args.source_sha) is not None and REPO.fullmatch(args.repository) is not None, "invalid exact SHA/repository")
-        require(os.environ.get("GITHUB_ACTIONS") == "true" and os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch"
-                and os.environ.get("GITHUB_SHA") == args.source_sha and os.environ.get("GITHUB_REPOSITORY") == args.repository,
-                "manual dispatch and workflow must be at the exact reviewed source SHA")
-        head = subprocess.run(["git", "-C", str(args.root), "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip()
-        require(head == args.source_sha, "checkout differs from dispatch/source SHA")
+        verify_checkout_identity(args.root, args.source_sha, args.publisher_sha, args.repository)
         expected = None
         if args.mode == "publish":
             require(args.artifact_id is not None and args.artifact_digest is not None and args.attempt is not None, "read-only verifier identity outputs required")
@@ -346,7 +359,7 @@ def main():
         with tempfile.TemporaryDirectory(prefix="gridcraft-release-") as temp:
             manifest, artifact, bundle = fetch_verified(api, args.repository, args.source_sha, args.ci_run_id, args.root, Path(temp), expected)
             if args.mode == "publish":
-                publish(api, manifest, artifact, bundle)
+                publish(api, manifest, artifact, bundle, args.publisher_sha)
             else:
                 output = os.environ.get("GITHUB_OUTPUT")
                 require(output is not None, "workflow output path missing")

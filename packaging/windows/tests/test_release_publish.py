@@ -195,12 +195,62 @@ class PublicationOrderTests(unittest.TestCase):
         self.assertNotIn("secrets.", workflow)
         self.assertNotIn("contents: write", workflow.split("  publish:")[0])
         self.assertEqual(workflow.count("contents: write"), 1)
-        self.assertEqual(workflow.count("persist-credentials: false"), 2)
-        self.assertIn('"$SOURCE_SHA" == "$GITHUB_SHA"', workflow)
+        self.assertEqual(workflow.count("persist-credentials: false"), 4)
+        self.assertIn('"$PUBLISHER_SHA" == "$GITHUB_SHA"', workflow)
+        self.assertEqual(workflow.count("ref: ${{ inputs.source_sha }}"), 2)
+        self.assertEqual(workflow.count("ref: ${{ inputs.publisher_sha }}"), 2)
+        self.assertEqual(workflow.count("--root .release-source"), 2)
+        self.assertIn("--publisher-sha", workflow)
         self.assertIn("--artifact-digest", workflow)
 
 
+class DispatchIdentityTests(unittest.TestCase):
+    def test_separate_source_and_publisher_are_both_exact(self):
+        publisher = "d" * 40
+        env = {"GITHUB_ACTIONS": "true", "GITHUB_EVENT_NAME": "workflow_dispatch",
+               "GITHUB_SHA": publisher, "GITHUB_REPOSITORY": REPOSITORY}
+        def result(value): return release.subprocess.CompletedProcess([], 0, stdout=value + "\n")
+        with patch.dict(os.environ, env), patch.object(release.subprocess, "run", side_effect=[result(publisher), result(SOURCE)]) as run:
+            release.verify_checkout_identity(Path("source-checkout"), SOURCE, publisher, REPOSITORY)
+            self.assertEqual(run.call_count, 2)
+            self.assertEqual(run.call_args_list[1].args[0][2], "source-checkout")
+        for heads in ((SOURCE, SOURCE), (publisher, publisher)):
+            with self.subTest(heads=heads), patch.dict(os.environ, env), patch.object(release.subprocess, "run", side_effect=[result(x) for x in heads]):
+                with self.assertRaisesRegex(ValueError, "checkout differs"):
+                    release.verify_checkout_identity(Path("source-checkout"), SOURCE, publisher, REPOSITORY)
+
+    def test_wrong_dispatch_sha_or_event_is_rejected_before_git(self):
+        env = {"GITHUB_ACTIONS": "true", "GITHUB_EVENT_NAME": "push", "GITHUB_SHA": SOURCE, "GITHUB_REPOSITORY": REPOSITORY}
+        for changed in ({}, {"GITHUB_EVENT_NAME": "workflow_dispatch", "GITHUB_SHA": "b" * 40}):
+            with patch.dict(os.environ, {**env, **changed}), patch.object(release.subprocess, "run") as run:
+                with self.assertRaisesRegex(ValueError, "manual dispatch"):
+                    release.verify_checkout_identity(Path("source"), SOURCE, "d" * 40, REPOSITORY)
+                run.assert_not_called()
+
+    def test_release_body_identifies_tooling_separately_from_binary_source(self):
+        with tempfile.TemporaryDirectory() as temp:
+            _, _, manifest = create_fixture(Path(temp))
+            _, _, artifact = ci_fixture()
+            body = release.release_body(manifest, artifact, "d" * 40)
+            self.assertIn("Source commit: " + SOURCE, body)
+            self.assertIn("/commit/" + "d" * 40 + " (does not rebuild the packages)", body)
+
+
 class CredentialBoundaryTests(unittest.TestCase):
+    def test_artifact_zip_and_release_asset_use_distinct_media_types(self):
+        requests = []
+        class Opener:
+            def open(self, request, timeout):
+                requests.append(request)
+                return io.BytesIO(b"binary fixture")
+        api = release.Api(REPOSITORY)
+        api.opener = Opener()
+        with tempfile.TemporaryDirectory() as temp, patch.dict(os.environ, {"GH_TOKEN": "synthetic-test-token"}):
+            for index, endpoint in enumerate(("actions/artifacts/99/zip", "releases/assets/88")):
+                api.request(f"/repos/{REPOSITORY}/{endpoint}", output=Path(temp) / str(index))
+        self.assertEqual(requests[0].get_header("Accept"), "application/vnd.github+json")
+        self.assertEqual(requests[1].get_header("Accept"), "application/octet-stream")
+
     def test_authenticated_redirect_becomes_strictly_anonymous(self):
         requests = []
         class Response(io.BytesIO):
