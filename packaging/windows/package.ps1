@@ -34,17 +34,11 @@ function Invoke-Native([string] $What, [scriptblock] $Block) {
 }
 
 # The version lives in one place: [workspace.package] version in the root Cargo.toml.
-$Version = $env:GRIDCRAFT_VERSION
-if (-not $Version) {
-  $inPkg = $false
-  foreach ($line in Get-Content (Join-Path $Root 'Cargo.toml')) {
-    if ($line -match '^\s*\[') { $inPkg = ($line.Trim() -eq '[workspace.package]'); continue }
-    if ($inPkg -and $line -match '^\s*version\s*=\s*"([^"]+)"') { $Version = $Matches[1]; break }
-  }
-}
-if (-not $Version) { throw 'could not read [workspace.package] version from Cargo.toml' }
-# MSI ProductVersion is numeric (major.minor.build); pre-release tags are dropped there.
-$MsiVersion = ($Version -split '-')[0]
+# Validate before creating output or building. An override cannot relabel Cargo binaries.
+. (Join-Path $PSScriptRoot 'version.ps1')
+$PackageVersion = Get-GridCraftPackageVersion -ManifestPath (Join-Path $Root 'Cargo.toml') -VersionOverride $env:GRIDCRAFT_VERSION
+$Version = $PackageVersion.FullVersion
+$MsiVersion = $PackageVersion.MsiVersion
 
 $Target = switch ($Arch) { 'x64' { 'x86_64-pc-windows-msvc' } 'x86' { 'i686-pc-windows-msvc' } 'arm64' { 'aarch64-pc-windows-msvc' } }
 $Dist = if ($env:DIST) { $env:DIST } else { Join-Path $Root 'dist\release' }
@@ -54,7 +48,7 @@ New-Item -ItemType Directory -Force -Path $Dist | Out-Null
 if (-not $env:GRIDCRAFT_BUILD_SHA) { $env:GRIDCRAFT_BUILD_SHA = (git -C $Root rev-parse HEAD 2>$null) }
 if (-not $env:GRIDCRAFT_BUILD_DATE) { $env:GRIDCRAFT_BUILD_DATE = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd') }
 
-Write-Output "GridCraft-Next $Version for Windows $Arch ($Target)"
+Write-Output "GridCraft-Next $Version for Windows $Arch ($Target); MSI ProductVersion $MsiVersion"
 
 if (-not $SkipBuild) {
   # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
@@ -101,7 +95,7 @@ Write-PackageLegalManifest $LegalDir $LegalManifest
 $Msi = Join-Path $Dist "gridcraft-next-$Version-windows-$Arch.msi"
 Invoke-Native 'wix build' {
   wix build (Join-Path $PSScriptRoot 'gridcraft.wxs') $LegalManifest -arch $Arch `
-    -d "Version=$MsiVersion" -d "BinDir=$Stage" -d "IconPath=$(Join-Path $Root 'assets\app-icon\gridcraft.ico')" `
+    -d "Version=$MsiVersion" -d "FullVersion=$Version" -d "BinDir=$Stage" -d "IconPath=$(Join-Path $Root 'assets\app-icon\gridcraft.ico')" `
     -o $Msi
 }
 # wix writes its debug symbols (.wixpdb) next to the MSI; keep them out of the release assets.

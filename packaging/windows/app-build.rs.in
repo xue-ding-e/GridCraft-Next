@@ -33,7 +33,7 @@ fn main() {
         .set("CompanyName", "xue-ding-e")
         .set("LegalCopyright", "Copyright (c) the GridCraft authors. MIT OR Apache-2.0.")
         .set("OriginalFilename", "gridcraft-next.exe")
-        .set("InternalName", "gridcraft");
+        .set("InternalName", "gridcraft-next");
     if let Err(e) = res.compile() {
         if std::env::var_os("GRIDCRAFT_REQUIRE_WINRES").is_some() {
             eprintln!("embedding Windows resources failed: {e}");

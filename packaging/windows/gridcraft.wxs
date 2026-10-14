@@ -14,6 +14,11 @@
   install side by side instead of replacing the old version.
 -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <!-- Direct installer-fixture builds may supply only numeric Version. Production
+       package.ps1 always passes the complete Cargo SemVer separately as FullVersion. -->
+  <?ifndef FullVersion ?>
+    <?define FullVersion = "$(var.Version)" ?>
+  <?endif ?>
   <Package
       Name="GridCraft-Next"
       Manufacturer="xue-ding-e"
@@ -23,10 +28,24 @@
       Compressed="yes"
       Language="1033">
     <SummaryInformation Description="GridCraft-Next spreadsheet" Manufacturer="xue-ding-e" />
-    <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
-         (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
-    <MajorUpgrade AllowSameVersionUpgrades="yes"
+    <!-- version.ps1 assigns each accepted SemVer a unique, ordered MSI version.
+         Never enable AllowSameVersionUpgrades: a rebuilt equal version is not an upgrade. -->
+    <MajorUpgrade
         DowngradeErrorMessage="A newer version of GridCraft-Next is already installed." />
+    <!-- MajorUpgrade alone does not reject another ProductCode at an equal version.
+         OnlyDetect leaves that installation untouched; Installed permits maintenance
+         and repair of the original MSI/ProductCode. Keep this Next identity independent. -->
+    <Upgrade Id="73F9F3B2-548C-4F5B-8934-253B3C29E0B1">
+      <UpgradeVersion Minimum="$(var.Version)" Maximum="$(var.Version)"
+          IncludeMinimum="yes" IncludeMaximum="yes" OnlyDetect="yes"
+          Property="GRIDCRAFTNEXT_SAME_VERSION" />
+    </Upgrade>
+    <!-- WiX also automatically secures UpgradeVersion's public detection property. -->
+    <Property Id="GRIDCRAFTNEXT_SAME_VERSION" Secure="yes" />
+    <Launch Condition="Installed OR NOT GRIDCRAFTNEXT_SAME_VERSION"
+        Message="This version of GridCraft-Next is already installed. Use the original installer to repair it, or install a newer version." />
+    <Property Id="GRIDCRAFTNEXT_FULL_VERSION" Value="$(var.FullVersion)" />
+    <Property Id="ARPCOMMENTS" Value="GridCraft-Next $(var.FullVersion)" />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
 
     <Icon Id="GridcraftIcon.ico" SourceFile="$(var.IconPath)" />
@@ -135,6 +154,10 @@
       </Dialog>
     </UI>
     <InstallUISequence>
+      <!-- Detection must precede the guard for full UI as well as silent installation.
+           These are WiX 5's standard sequence values, made explicit for the invariant. -->
+      <FindRelatedProducts Sequence="25" />
+      <LaunchConditions Sequence="100" />
       <!-- Component conditions must see the choice before costing. Do not show the choice
            during basic/silent installs, repair or uninstall. -->
       <Show Dialog="DesktopShortcutDlg" Before="CostInitialize" Condition="NOT Installed AND NOT REMOVE AND UILevel = 5" />
@@ -142,6 +165,10 @@
       <Show Dialog="SetupCanceledDlg" OnExit="cancel" Condition="UILevel = 5" />
       <Show Dialog="SetupFailedDlg" OnExit="error" Condition="UILevel = 5" />
     </InstallUISequence>
+    <InstallExecuteSequence>
+      <FindRelatedProducts Sequence="25" />
+      <LaunchConditions Sequence="100" />
+    </InstallExecuteSequence>
     <AdminUISequence>
       <Show Dialog="SetupCompleteDlg" OnExit="success" Condition="UILevel = 5" />
       <Show Dialog="SetupCanceledDlg" OnExit="cancel" Condition="UILevel = 5" />
