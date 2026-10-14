@@ -20,6 +20,8 @@ def file_fact(path):
 
 def reduce_messages(lines):
     packages, diagnostics, malformed = set(), [], 0
+    artifacts = set()
+    feature_metadata_complete = True
     success = None
     for line in lines:
         if not line.strip():
@@ -38,6 +40,15 @@ def reduce_messages(lines):
             # already in the reviewed source. Do not upload the runner path.
             if package.startswith(("registry+", "git+")):
                 packages.add(package)
+                features = record.get("features")
+                target = record.get("target", {})
+                kinds = target.get("kind") if isinstance(target, dict) else None
+                valid_features = isinstance(features, list) and all(isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9_.+-]*", value) for value in features)
+                valid_kinds = isinstance(kinds, list) and all(value in ("lib", "rlib", "dylib", "cdylib", "staticlib", "proc-macro", "bin", "example", "test", "bench", "custom-build") for value in kinds)
+                if valid_features and valid_kinds:
+                    artifacts.add((package, tuple(sorted(features)), tuple(sorted(kinds))))
+                else:
+                    feature_metadata_complete = False
         elif reason == "compiler-message":
             message = record.get("message", {})
             if message.get("level") not in ("error", "warning", "failure-note"):
@@ -48,6 +59,8 @@ def reduce_messages(lines):
         # Explicitly omit rendered source excerpts, build-script env/link values,
         # output directories, arbitrary future record fields, and credential data.
     return {"build_finished_success": success, "observed_external_package_ids": sorted(packages),
+            "observed_external_artifacts": [{"package_id": package, "features": list(features), "target_kinds": list(kinds)} for package, features, kinds in sorted(artifacts)],
+            "external_feature_metadata_complete": feature_metadata_complete and bool(artifacts),
             "compiler_diagnostics": diagnostics, "malformed_line_count": malformed}
 
 

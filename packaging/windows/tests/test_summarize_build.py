@@ -10,6 +10,19 @@ SPEC.loader.exec_module(MODULE)
 
 
 class BuildSummaryTests(unittest.TestCase):
+    def test_records_exact_external_features_and_kinds_without_paths(self):
+        package = "registry+https://github.com/rust-lang/crates.io-index#example@1.0.0"
+        record = {"reason": "compiler-artifact", "package_id": package, "features": ["png", "jpeg"], "target": {"kind": ["lib"], "src_path": "private-source", "name": "private-name"}, "filenames": ["private-binary"], "env": {"key": "private-env"}}
+        result = MODULE.reduce_messages([json.dumps(record), json.dumps(record)])
+        self.assertEqual(result["observed_external_artifacts"], [{"package_id": package, "features": ["jpeg", "png"], "target_kinds": ["lib"]}])
+        self.assertTrue(result["external_feature_metadata_complete"])
+        self.assertNotIn("private", json.dumps(result))
+        record["features"] = ["/private/path"]
+        result = MODULE.reduce_messages([json.dumps(record)])
+        self.assertFalse(result["external_feature_metadata_complete"])
+        self.assertEqual(result["observed_external_artifacts"], [])
+        self.assertNotIn("private", json.dumps(result))
+
     def test_omits_env_links_rendered_source_and_absolute_paths(self):
         messages = [
             {"reason": "build-script-executed", "env": [["SYNTHETIC_TEST_SECRET", "do-not-export"]], "linked_paths": ["private-path"]},

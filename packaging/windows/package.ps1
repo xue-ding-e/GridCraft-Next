@@ -113,6 +113,7 @@ $Review = if (Test-Path -LiteralPath $ReviewPath) { Get-Content -LiteralPath $Re
 $CollectArgs = @(
   (Join-Path $PSScriptRoot 'collect-licenses.py'), '--metadata', $Metadata,
   '--build-messages', $BuildMessages, '--lockfile', (Join-Path $Root 'Cargo.lock'),
+  '--target', $Target,
   '--output', $ThirdParty, '--supplements', (Join-Path $PSScriptRoot 'license-supplements\supplements.json')
 )
 if ($Review -and $Review.reviewed_fingerprint) { $CollectArgs += @('--reviewed-fingerprint', $Review.reviewed_fingerprint) }

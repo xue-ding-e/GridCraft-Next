@@ -31,7 +31,8 @@ def canonical(data):
 
 def legal_name(path):
     name = path.name.lower()
-    return name.startswith(("license", "licence", "copying", "copyright", "notice", "unlicense")) or name in ("ofl.txt", "ufl.txt") or name.endswith("-license.txt")
+    credit_file = path.stem.lower() in ("authors", "contributors") and path.suffix.lower() in ("", ".txt", ".md", ".rst")
+    return name.startswith(("license", "licence", "copying", "copyright", "notice", "unlicense")) or name in ("ofl.txt", "ufl.txt") or name.endswith("-license.txt") or credit_file
 
 
 def safe_file(root, relative):
@@ -52,34 +53,75 @@ def safe_file(root, relative):
     return data
 
 
+def artifact_scope(message, package_id):
+    """Keep only actual feature/kind instances, never paths or build-script env."""
+    target = message.get("target")
+    if not isinstance(target, dict):
+        raise CollectionError(f"compiler-artifact target metadata missing or invalid: {package_id}")
+    normalized = []
+    for name, values, allow_empty in (("features", message.get("features"), True), ("target.kind", target.get("kind"), False)):
+        if not isinstance(values, list) or (not values and not allow_empty) or any(
+            not isinstance(value, str) or not value or value != value.strip()
+            or any(ord(char) < 32 or ord(char) == 127 for char in value)
+            for value in values
+        ):
+            raise CollectionError(f"compiler-artifact {name} metadata missing or invalid: {package_id}")
+        normalized.append(tuple(sorted(set(values))))
+    allowed_kinds = {"bin", "lib", "rlib", "dylib", "cdylib", "staticlib", "proc-macro", "example", "test", "bench", "custom-build"}
+    if not set(normalized[1]).issubset(allowed_kinds):
+        raise CollectionError(f"compiler-artifact target.kind is not recognized: {package_id}")
+    return tuple(normalized)
+
+
+def scope_records(instances):
+    return [{"features": list(features), "target_kind": list(kinds)} for features, kinds in sorted(instances)]
+
+
 def artifact_packages(messages, metadata):
     known = {p["id"]: p for p in metadata["packages"]}
     observed = {}
+    instances = {}
+    root_instances = set()
     roots = set()
     success = False
     for message in messages:
+        if not isinstance(message, dict):
+            raise CollectionError("Cargo JSON message must be an object")
         reason = message.get("reason")
         if reason == "build-finished":
             success = message.get("success") is True
         if reason not in ("compiler-artifact", "build-script-executed"):
             continue
         package_id = message.get("package_id")
-        if package_id not in known:
+        if not isinstance(package_id, str) or package_id not in known:
             raise CollectionError(f"build package missing from metadata: {package_id}")
         observed.setdefault(package_id, set()).add(reason)
-        if message.get("executable") and message.get("target", {}).get("name") in ("gridcraft", "gridcraft-cli"):
-            roots.add(message["target"]["name"])
+        if reason == "compiler-artifact":
+            scope = artifact_scope(message, package_id)
+            instances.setdefault(package_id, set()).add(scope)
+            name = message["target"].get("name")
+            if message.get("executable") and name in ("gridcraft", "gridcraft-cli"):
+                if "bin" not in scope[1]:
+                    raise CollectionError(f"root executable artifact is not a bin target: {name}")
+                roots.add(name)
+                root_instances.add((name, *scope))
     if not success:
         raise CollectionError("Cargo JSON messages do not end in a successful build-finished record")
     if roots != {"gridcraft", "gridcraft-cli"}:
         raise CollectionError("both actual gridcraft and gridcraft-cli executable artifacts are required")
-    return known, observed
+    for package_id in observed:
+        if package_id not in instances:
+            raise CollectionError(f"observed build package lacks compiler-artifact scope metadata: {package_id}")
+    root_records = [{"name": name, "features": list(features), "target_kind": list(kinds)} for name, features, kinds in sorted(root_instances)]
+    return known, observed, instances, root_records
 
 
-def collect(metadata, messages, lock_bytes, output, supplements=None):
+def collect(metadata, messages, lock_bytes, output, target, supplements=None):
     """Supplements explicitly bind reviewed text bytes to an exact package/source."""
     supplements = supplements or {}
-    known, observed = artifact_packages(messages, metadata)
+    if not isinstance(target, str) or not re.fullmatch(r"[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+){2,}", target):
+        raise CollectionError("an explicit valid build target triple is required")
+    known, observed, instances, root_records = artifact_packages(messages, metadata)
     locked = tomllib.loads(lock_bytes.decode("utf-8"))["package"]
     workspace = set(metadata.get("workspace_members", []))
     output = Path(output)
@@ -93,7 +135,7 @@ def collect(metadata, messages, lock_bytes, output, supplements=None):
             continue  # Project LICENSE/NOTICE are separately staged verbatim.
         root = Path(package["manifest_path"]).parent
         identity = {k: package.get(k) for k in ("name", "version", "source", "license", "repository", "authors")}
-        record = {**identity, "package_id": package_id, "build_evidence": sorted(observed[package_id]), "files": []}
+        record = {**identity, "package_id": package_id, "build_evidence": sorted(observed[package_id]), "compiler_artifacts": scope_records(instances[package_id]), "files": []}
         matches = [p for p in locked if p.get("name") == package["name"] and p.get("version") == package["version"] and p.get("source") == package.get("source")]
         if len(matches) != 1:
             problems.append(f"{package_id}: not uniquely matched to exact Cargo.lock source")
@@ -149,7 +191,7 @@ def collect(metadata, messages, lock_bytes, output, supplements=None):
         if not package.get("license") and not package.get("license_file"):
             problems.append(f"{package_id}: no license expression or license_file declared")
         records.append(record)
-    inventory = {"schema": 1, "scope": "Observed GUI/CLI Cargo build package set, conservatively including host build inputs; not a linked-code-only claim", "lock_sha256": digest(lock_bytes), "packages": records, "problems": problems}
+    inventory = {"schema": 2, "scope": "Observed GUI/CLI Cargo build package set, conservatively including host build inputs; feature/kind instances do not prove final linkage or distinguish host from target compilation", "target": target, "root_artifacts": root_records, "lock_sha256": digest(lock_bytes), "packages": records, "problems": problems}
     inventory["review_fingerprint"] = digest(canonical(inventory))
     (output / "THIRD_PARTY_INVENTORY.json").write_text(json.dumps(inventory, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     lines = ["GridCraft-Next third-party build-input notices", "", inventory["scope"], "", "Original license and copyright texts are preserved in the named files.", "Declared SPDX expressions are recorded without replacing AND obligations or", "silently treating OR alternatives as a single universal license.", ""]
@@ -167,6 +209,7 @@ def main():
     parser.add_argument("--build-messages", type=Path, required=True)
     parser.add_argument("--lockfile", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--target", required=True, help="Explicit Cargo build target triple; host build inputs remain conservatively included")
     parser.add_argument("--supplements", type=Path)
     parser.add_argument("--reviewed-fingerprint", help="Exact fingerprint approved after license/notice review; no wildcard or skip mode")
     args = parser.parse_args()
@@ -182,7 +225,7 @@ def main():
                         raise CollectionError("supplement paths must stay inside the reviewed supplement directory")
                     item["_root"] = str(args.supplements.parent)
                     item["path"] = relative.as_posix()
-        inventory = collect(metadata, messages, args.lockfile.read_bytes(), args.output, supplements)
+        inventory = collect(metadata, messages, args.lockfile.read_bytes(), args.output, args.target, supplements)
         print(json.dumps({"packages": len(inventory["packages"]), "problems": inventory["problems"], "review_fingerprint": inventory["review_fingerprint"]}))
         if inventory["problems"] or args.reviewed_fingerprint != inventory["review_fingerprint"]:
             print("Legal collection is not distribution-approved: resolve issues and review the exact fingerprint.", file=sys.stderr)
